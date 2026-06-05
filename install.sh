@@ -5,7 +5,6 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 LOG_DIR="${HOME}/.local/state/edw-kit"
 LOG_FILE="${LOG_DIR}/install.log"
 TIER="${1:-1}"
-MAS_APP_1FOCUS_ID="1258530160"
 
 mkdir -p "${LOG_DIR}"
 touch "${LOG_FILE}"
@@ -114,11 +113,12 @@ post_install_checks() {
 }
 
 install_mas_apps() {
+  local mas_app_1focus_id="1258530160"
   if ! command -v mas >/dev/null 2>&1; then
     return
   fi
   if mas account >/dev/null 2>&1; then
-    run_step "mas install 1Focus" mas install "${MAS_APP_1FOCUS_ID}"
+    run_step "mas install 1Focus" mas install "${mas_app_1focus_id}"
   else
     log "SKIP: mas install (App Store not signed in)"
   fi
