@@ -35,12 +35,17 @@ brew_bundle() {
 }
 
 stow_tier() {
-  local tier="$1"
-  run_step "stow dotfiles/${tier}" stow --restow --target="${HOME}" --dir="${ROOT_DIR}" "dotfiles/${tier}"
+  local tier_name="$1"
+  run_step "stow dotfiles/${tier_name}" stow --restow --target="${HOME}" --dir="${ROOT_DIR}" "dotfiles/${tier_name}"
 }
 
 ensure_oh_my_zsh_plugins() {
-  local zsh_custom="${ZSH_CUSTOM:-${HOME}/.oh-my-zsh/custom}"
+  local zsh_custom
+  if [[ -n "${ZSH_CUSTOM:-}" ]]; then
+    zsh_custom="${ZSH_CUSTOM}"
+  else
+    zsh_custom="${HOME}/.oh-my-zsh/custom"
+  fi
   local plugins_dir="${zsh_custom}/plugins"
 
   if [[ ! -d "${HOME}/.oh-my-zsh" ]]; then
