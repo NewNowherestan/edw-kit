@@ -29,14 +29,35 @@ require_cmd() {
   fi
 }
 
+check_cmd_warn() {
+  local cmd="$1"
+  if ! command -v "${cmd}" >/dev/null 2>&1; then
+    log "WARN: command '${cmd}' not found in PATH"
+  fi
+}
+
 brew_bundle() {
   local file="$1"
   run_step "brew bundle ${file}" brew bundle --file="${ROOT_DIR}/${file}"
 }
 
+brew_bundle_no_mas() {
+  local file="$1"
+  run_step "brew bundle ${file} (skip mas)" env HOMEBREW_BUNDLE_MAS_SKIP=1 brew bundle --file="${ROOT_DIR}/${file}"
+}
+
 stow_tier() {
   local tier_name="$1"
   run_step "stow dotfiles/${tier_name}" stow --restow --target="${HOME}" --dir="${ROOT_DIR}" "dotfiles/${tier_name}"
+}
+
+stow_host_overlay() {
+  local host_name
+  host_name="$(hostname -s)"
+  local host_dir="${ROOT_DIR}/dotfiles/hosts/${host_name}"
+  if [[ -d "${host_dir}" ]]; then
+    run_step "stow dotfiles/hosts/${host_name}" stow --restow --target="${HOME}" --dir="${ROOT_DIR}/dotfiles/hosts" "${host_name}"
+  fi
 }
 
 ensure_oh_my_zsh_plugins() {
@@ -63,11 +84,47 @@ ensure_oh_my_zsh_plugins() {
   fi
 }
 
+post_install_checks() {
+  local tier_name="$1"
+  case "${tier_name}" in
+    1)
+      check_cmd_warn zsh
+      check_cmd_warn tmux
+      check_cmd_warn stow
+      ;;
+    2)
+      if [[ "$(uname -s)" == "Darwin" ]]; then
+        [[ -d "/Applications/AeroSpace.app" ]] || log "WARN: AeroSpace.app missing"
+        [[ -d "/Applications/Karabiner-Elements.app" ]] || log "WARN: Karabiner-Elements.app missing"
+      fi
+      ;;
+    3)
+      if command -v mas >/dev/null 2>&1; then
+        if ! mas account >/dev/null 2>&1; then
+          log "WARN: App Store not signed in; skipping mas app installs"
+        fi
+      fi
+      ;;
+  esac
+}
+
+install_mas_apps() {
+  if ! command -v mas >/dev/null 2>&1; then
+    return
+  fi
+  if mas account >/dev/null 2>&1; then
+    run_step "mas install 1Focus" mas install 1258530160
+  else
+    log "SKIP: mas install (App Store not signed in)"
+  fi
+}
+
 install_tier1() {
   brew_bundle "brew/Brewfile.tier1"
   require_cmd stow
   stow_tier "tier1"
   ensure_oh_my_zsh_plugins
+  post_install_checks 1
 }
 
 install_tier2() {
@@ -78,6 +135,7 @@ install_tier2() {
   fi
   brew_bundle "brew/Brewfile.tier2"
   stow_tier "tier2"
+  post_install_checks 2
 }
 
 install_tier3() {
@@ -86,7 +144,9 @@ install_tier3() {
     log "SKIP: tier3 is macOS-only"
     return
   fi
-  brew_bundle "brew/Brewfile.tier3"
+  brew_bundle_no_mas "brew/Brewfile.tier3"
+  install_mas_apps
+  post_install_checks 3
 }
 
 main() {
@@ -103,6 +163,7 @@ main() {
       ;;
   esac
 
+  stow_host_overlay
   log "Done. Log: ${LOG_FILE}"
 }
 

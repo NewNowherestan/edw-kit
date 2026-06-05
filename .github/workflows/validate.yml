@@ -1,0 +1,26 @@
+name: Validate bootstrap files
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Homebrew
+        run: |
+          brew --version
+      - name: Validate Brewfiles parse
+        run: |
+          brew bundle check --no-upgrade --file=brew/Brewfile.tier1 || true
+          brew bundle check --no-upgrade --file=brew/Brewfile.tier2 || true
+          brew bundle check --no-upgrade --file=brew/Brewfile.tier3 || true
+      - name: Validate shell syntax
+        run: |
+          bash -n install.sh
+          bash -n bootstrap.sh
+          bash -n scripts/lock-brewfiles.sh
+          bash -n scripts/secrets-bootstrap.sh

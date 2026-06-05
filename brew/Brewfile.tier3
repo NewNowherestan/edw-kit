@@ -6,8 +6,9 @@ cask "vlc"                    # Media player
 cask "handbrake"              # Video transcoder — compress and convert footage
 cask "imageoptim"             # Lossless image compression
 cask "bartender"              # Menu bar organizer
-cask "raycast"                # Spotlight replacement — launcher, clipboard, snippets
-cask "monitorcontrol"         # External monitor brightness/volume from Mac
+cask "cleanmymac"             # macOS cleaner — cache, junk, app removal
+# cask "raycast"                # Spotlight replacement — launcher, clipboard, snippets
+# cask "monitorcontrol"         # External monitor brightness/volume from Mac
 
 brew "mas"
 mas "1Focus", id: 1258530160          # Focus / app blocker

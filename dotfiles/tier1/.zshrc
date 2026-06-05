@@ -6,7 +6,6 @@ plugins=(
   zsh-syntax-highlighting
   aliases
   tmux
-  iterm2
   docker
   copypath
   copyfile

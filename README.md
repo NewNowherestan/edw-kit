@@ -6,10 +6,17 @@
 
 - `brew/` tiered Brewfiles (`tier1`, `tier2`, `tier3`)
 - `dotfiles/tier1` and `dotfiles/tier2` mirror `$HOME` directly
-- `docs/` printable command cheatsheets
-- `submodules/` reserved for external config repos
+- `docs/` printable command cards/memos
+- `submodules/vimfiles` points to `https://github.com/DiskoGoth/vimfiles`
+- `dotfiles/hosts/<hostname>` optional host-specific overlay
 
 ## Install
+
+Bootstrap a fresh macOS machine (installs Homebrew if needed):
+
+```bash
+./bootstrap.sh
+```
 
 Default install is tier 1:
 
@@ -31,3 +38,10 @@ Tier cascade is automatic:
 - tier 3: tier 1 + tier 2 + full
 
 The installer is idempotent (`brew bundle` + `stow --restow`) and writes logs to `~/.local/state/edw-kit/install.log`.
+
+## Maintenance helpers
+
+```bash
+./scripts/lock-brewfiles.sh
+./scripts/secrets-bootstrap.sh
+```

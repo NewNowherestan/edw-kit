@@ -7,13 +7,14 @@ cask "hammerspoon"            # macOS automation via Lua — hotkeys, window rul
 
 # ── Terminal ─────────────────────────────────────────────────────────────────
 cask "alacritty"              # GPU-accelerated terminal — config-driven, fast
-cask "iterm2"                 # Feature-rich terminal — fallback / compatibility
 
 # ── Productivity ─────────────────────────────────────────────────────────────
 cask "stats"                  # System stats in menu bar — CPU, RAM, network
-cask "cleanmymac"             # macOS cleaner — cache, junk, app removal
 
 # ── Fonts ────────────────────────────────────────────────────────────────────
 cask "font-jetbrains-mono-nerd-font"
 cask "font-fira-code-nerd-font"
 cask "font-hack-nerd-font"
+cask "browserosaurus"        # Browser picker by link/app context
+cask "scroll-reverser"        # Separate trackpad/mouse scrolling direction
+cask "aldente"               # Battery charge limiter for longevity

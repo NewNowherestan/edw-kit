@@ -51,3 +51,5 @@ brew "just"                   # Command runner / Makefile alternative
 # brew "gnupg"                # GPG — signing, encryption (uncomment if needed)
 brew "ffmpeg"                 # Video/audio processing — transcoding, screenshots
 brew "yt-dlp"                 # Download video/audio from YouTube and 500+ sites
+
+brew "glow"                   # Markdown reader in terminal
