@@ -1,0 +1,15 @@
+# brew bundle --file=brew/Brewfile.tier3
+
+cask "telegram"
+cask "obs"                    # Screen recording and live streaming
+cask "vlc"                    # Media player
+cask "handbrake"              # Video transcoder — compress and convert footage
+cask "imageoptim"             # Lossless image compression
+cask "bartender"              # Menu bar organizer
+cask "raycast"                # Spotlight replacement — launcher, clipboard, snippets
+cask "monitorcontrol"         # External monitor brightness/volume from Mac
+
+brew "mas"
+mas "1Focus", id: 1258530160          # Focus / app blocker
+# mas "Lungo", id: 1263070803         # Keep Mac awake (use caffeinate instead)
+# mas "Amphetamine", id: 937984704    # Keep Mac awake alternative
