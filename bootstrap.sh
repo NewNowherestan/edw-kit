@@ -27,7 +27,8 @@ fi
 
 if ! command -v brew >/dev/null 2>&1; then
   echo "→ installing Homebrew"
-  NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  git -C "${ROOT_DIR}" submodule update --init submodules/homebrew-install
+  NONINTERACTIVE=1 bash "${ROOT_DIR}/submodules/homebrew-install/install.sh"
   if [[ -x /opt/homebrew/bin/brew ]]; then
     eval "$(/opt/homebrew/bin/brew shellenv)"
   elif [[ -x /usr/local/bin/brew ]]; then

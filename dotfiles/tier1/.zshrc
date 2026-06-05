@@ -1,3 +1,5 @@
+# zmodload zsh/zprof  # uncomment to profile startup: zsh -i -c 'zprof' 2>&1 | head -30
+
 export ZSH="$HOME/.oh-my-zsh"
 ZSH_THEME="robbyrussell"
 plugins=(
@@ -10,7 +12,13 @@ plugins=(
   copypath
   copyfile
   macos
+  iterm2
+  dirhistory
+  extract
   zsh-autosuggestions
+  zsh-auto-notify
+  zsh-you-should-use
+  fzf-tab
 )
 
 source "$ZSH/oh-my-zsh.sh"

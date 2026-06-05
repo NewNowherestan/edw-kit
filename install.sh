@@ -73,19 +73,27 @@ ensure_oh_my_zsh_plugins() {
   fi
   local plugins_dir="${zsh_custom}/plugins"
 
+  # Initialise all plugin submodules (pinned SHAs, no ad-hoc HTTP clones)
+  run_step "submodule init: oh-my-zsh + plugins" \
+    git -C "${ROOT_DIR}" submodule update --init --depth=1 \
+      submodules/oh-my-zsh \
+      submodules/zsh-autosuggestions \
+      submodules/zsh-syntax-highlighting \
+      submodules/zsh-auto-notify \
+      submodules/zsh-you-should-use \
+      submodules/fzf-tab
+
   if [[ ! -d "${HOME}/.oh-my-zsh" ]]; then
-    run_step "clone oh-my-zsh" git clone https://github.com/ohmyzsh/ohmyzsh.git "${HOME}/.oh-my-zsh"
+    run_step "link oh-my-zsh" ln -sf "${ROOT_DIR}/submodules/oh-my-zsh" "${HOME}/.oh-my-zsh"
   fi
 
   mkdir -p "${plugins_dir}"
 
-  if [[ ! -d "${plugins_dir}/zsh-autosuggestions" ]]; then
-    run_step "clone zsh-autosuggestions" git clone https://github.com/zsh-users/zsh-autosuggestions "${plugins_dir}/zsh-autosuggestions"
-  fi
-
-  if [[ ! -d "${plugins_dir}/zsh-syntax-highlighting" ]]; then
-    run_step "clone zsh-syntax-highlighting" git clone https://github.com/zsh-users/zsh-syntax-highlighting.git "${plugins_dir}/zsh-syntax-highlighting"
-  fi
+  for plugin in zsh-autosuggestions zsh-syntax-highlighting zsh-auto-notify zsh-you-should-use fzf-tab; do
+    if [[ ! -e "${plugins_dir}/${plugin}" ]]; then
+      run_step "link plugin: ${plugin}" ln -sf "${ROOT_DIR}/submodules/${plugin}" "${plugins_dir}/${plugin}"
+    fi
+  done
 }
 
 post_install_checks() {
