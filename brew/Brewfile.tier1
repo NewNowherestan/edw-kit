@@ -1,0 +1,55 @@
+# brew bundle --file=brew/Brewfile.tier1
+
+# ── Shell ────────────────────────────────────────────────────────────────────
+brew "zsh"
+brew "tmux"                   # Terminal multiplexer — persistent sessions, panes
+brew "starship"               # Cross-shell prompt — fast, git-aware
+brew "stow"                   # Symlink farm manager — how edw-kit installs itself
+
+# ── Editor ───────────────────────────────────────────────────────────────────
+brew "vim"                    # Classic editor — always available as fallback
+brew "neovim"                 # Modern vim — primary editor, lua config
+
+# ── Git ──────────────────────────────────────────────────────────────────────
+brew "git"
+brew "git-delta"              # Better diffs — syntax highlighted, side-by-side
+brew "lazygit"                # TUI git client — standalone or inside nvim
+
+# ── File & search ────────────────────────────────────────────────────────────
+brew "fzf"                    # Fuzzy finder — history, files, processes
+brew "ripgrep"                # rg — fast recursive grep, used by nvim
+brew "fd"                     # Fast find alternative — used by fzf and nvim
+brew "bat"                    # Better cat — syntax highlighting, line numbers
+brew "eza"                    # Modern ls — icons, git status, tree view
+brew "zoxide"                 # Smart cd — jumps to frecently used dirs
+brew "tree"                   # Directory tree view
+
+# ── System & process ─────────────────────────────────────────────────────────
+brew "htop"                   # Interactive process viewer
+brew "btop"                   # Resource monitor — prettier than htop
+brew "dust"                   # du replacement — visual disk usage
+brew "duf"                    # df replacement — cleaner disk info
+
+# ── Network ──────────────────────────────────────────────────────────────────
+brew "curl"
+brew "wget"
+brew "httpie"                 # Human-friendly HTTP client — quick API testing
+
+# ── Data & text ──────────────────────────────────────────────────────────────
+brew "jq"                     # JSON processor — essential for scripts and APIs
+brew "yq"                     # YAML/JSON/XML processor — jq for structured files
+brew "gawk"                   # GNU awk — text processing
+brew "gnu-sed"                # GNU sed — macOS sed is BSD, this is the real one
+
+# ── Productivity ─────────────────────────────────────────────────────────────
+brew "tldr"                   # Simplified man pages — practical examples
+brew "cheat"                  # Community cheatsheets for common commands
+brew "direnv"                 # Auto-load .envrc on cd — per-project env vars
+brew "entr"                   # Run commands on file change — lightweight watch
+brew "just"                   # Command runner / Makefile alternative
+# brew "age"                  # Simple modern file encryption (uncomment if needed)
+# brew "gnupg"                # GPG — signing, encryption (uncomment if needed)
+brew "ffmpeg"                 # Video/audio processing — transcoding, screenshots
+brew "yt-dlp"                 # Download video/audio from YouTube and 500+ sites
+
+brew "glow"                   # Markdown reader in terminal

@@ -1,0 +1,20 @@
+# brew bundle --file=brew/Brewfile.tier2
+
+# ── Window & input ───────────────────────────────────────────────────────────
+cask "aerospace"              # Tiling window manager — i3-inspired, keyboard-driven
+cask "karabiner-elements"     # Key remapping — Caps Lock → layout/input switch
+cask "hammerspoon"            # macOS automation via Lua — hotkeys, window rules
+
+# ── Terminal ─────────────────────────────────────────────────────────────────
+cask "alacritty"              # GPU-accelerated terminal — config-driven, fast
+
+# ── Productivity ─────────────────────────────────────────────────────────────
+cask "stats"                  # System stats in menu bar — CPU, RAM, network
+
+# ── Fonts ────────────────────────────────────────────────────────────────────
+cask "font-jetbrains-mono-nerd-font"
+cask "font-fira-code-nerd-font"
+cask "font-hack-nerd-font"
+cask "browserosaurus"         # Browser picker by link/app context
+cask "scroll-reverser"        # Separate trackpad/mouse scrolling direction
+cask "aldente"                # Battery charge limiter for longevity
