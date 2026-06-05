@@ -7,7 +7,7 @@ LOG_FILE="${LOG_DIR}/install.log"
 TIER="${1:-1}"
 
 mkdir -p "${LOG_DIR}"
-> "${LOG_FILE}"
+touch "${LOG_FILE}"
 
 log() {
   printf '[%s] %s\n' "$(date '+%Y-%m-%d %H:%M:%S')" "$*" | tee -a "${LOG_FILE}"
