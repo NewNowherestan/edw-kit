@@ -5,6 +5,7 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 LOG_DIR="${HOME}/.local/state/edw-kit"
 LOG_FILE="${LOG_DIR}/install.log"
 TIER="${1:-1}"
+MAS_APP_1FOCUS_ID="1258530160"
 
 mkdir -p "${LOG_DIR}"
 touch "${LOG_FILE}"
@@ -53,7 +54,11 @@ stow_tier() {
 
 stow_host_overlay() {
   local host_name
-  host_name="$(hostname -s)"
+  if [[ "$(uname -s)" == "Darwin" ]] && command -v scutil >/dev/null 2>&1; then
+    host_name="$(scutil --get LocalHostName 2>/dev/null || hostname -s)"
+  else
+    host_name="$(hostname -s)"
+  fi
   local host_dir="${ROOT_DIR}/dotfiles/hosts/${host_name}"
   if [[ -d "${host_dir}" ]]; then
     run_step "stow dotfiles/hosts/${host_name}" stow --restow --target="${HOME}" --dir="${ROOT_DIR}/dotfiles/hosts" "${host_name}"
@@ -113,7 +118,7 @@ install_mas_apps() {
     return
   fi
   if mas account >/dev/null 2>&1; then
-    run_step "mas install 1Focus" mas install 1258530160
+    run_step "mas install 1Focus" mas install "${MAS_APP_1FOCUS_ID}"
   else
     log "SKIP: mas install (App Store not signed in)"
   fi

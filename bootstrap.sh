@@ -20,7 +20,7 @@ if ! xcode-select -p >/dev/null 2>&1; then
   exit 1
 fi
 
-if [[ "$(uname -m)" == "arm64" ]] && ! /usr/bin/pgrep oahd >/dev/null 2>&1; then
+if [[ "$(uname -m)" == "arm64" ]] && ! /usr/bin/arch -x86_64 /usr/bin/true >/dev/null 2>&1; then
   echo "→ installing Rosetta 2"
   /usr/sbin/softwareupdate --install-rosetta --agree-to-license
 fi

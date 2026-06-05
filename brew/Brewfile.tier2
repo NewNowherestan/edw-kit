@@ -15,6 +15,6 @@ cask "stats"                  # System stats in menu bar — CPU, RAM, network
 cask "font-jetbrains-mono-nerd-font"
 cask "font-fira-code-nerd-font"
 cask "font-hack-nerd-font"
-cask "browserosaurus"        # Browser picker by link/app context
-cask "scroll-reverser"        # Separate trackpad/mouse scrolling direction
-cask "aldente"               # Battery charge limiter for longevity
+cask "browserosaurus"         # Browser picker by link/app context.
+cask "scroll-reverser"        # Separate trackpad/mouse scrolling direction.
+cask "aldente"                # Battery charge limiter for longevity.
