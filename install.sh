@@ -83,15 +83,20 @@ ensure_oh_my_zsh_plugins() {
       submodules/zsh-you-should-use \
       submodules/fzf-tab
 
-  if [[ ! -d "${HOME}/.oh-my-zsh" ]]; then
+  if [[ ! -e "${HOME}/.oh-my-zsh" ]]; then
     run_step "link oh-my-zsh" ln -sf "${ROOT_DIR}/submodules/oh-my-zsh" "${HOME}/.oh-my-zsh"
+  elif [[ ! -L "${HOME}/.oh-my-zsh" ]]; then
+    log "WARN: ${HOME}/.oh-my-zsh exists and is not a symlink — skipping link (preserve local install)"
   fi
 
   mkdir -p "${plugins_dir}"
 
   for plugin in zsh-autosuggestions zsh-syntax-highlighting zsh-auto-notify zsh-you-should-use fzf-tab; do
-    if [[ ! -e "${plugins_dir}/${plugin}" ]]; then
-      run_step "link plugin: ${plugin}" ln -sf "${ROOT_DIR}/submodules/${plugin}" "${plugins_dir}/${plugin}"
+    local target="${plugins_dir}/${plugin}"
+    if [[ ! -e "${target}" ]]; then
+      run_step "link plugin: ${plugin}" ln -sf "${ROOT_DIR}/submodules/${plugin}" "${target}"
+    elif [[ ! -L "${target}" ]]; then
+      log "WARN: ${target} exists and is not a symlink — skipping link (preserve local install)"
     fi
   done
 }

@@ -18,7 +18,7 @@ plugins=(
   zsh-autosuggestions
   zsh-auto-notify
   zsh-you-should-use
-  fzf-tab
+  fzf-tab                # requires fzf (brew install fzf — included in tier1)
 )
 
 source "$ZSH/oh-my-zsh.sh"
