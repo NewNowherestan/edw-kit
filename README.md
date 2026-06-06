@@ -5,7 +5,7 @@
 ## Layout
 
 - `brew/` tiered Brewfiles (`tier1`, `tier2`, `tier3`)
-- `dotfiles/tier1` and `dotfiles/tier2` mirror `$HOME` directly
+- `dotfiles/terminal` and `dotfiles/workstation` mirror `$HOME` directly
 - `docs/` printable command cards/memos
 - `submodules/vimfiles` points to `https://github.com/DiskoGoth/vimfiles`
 - `dotfiles/hosts/<hostname>` optional host-specific overlay

@@ -140,7 +140,7 @@ install_mas_apps() {
 install_tier1() {
   brew_bundle "brew/Brewfile.tier1"
   require_cmd stow
-  stow_tier "tier1"
+  stow_tier "terminal"
   ensure_oh_my_zsh_plugins
   post_install_checks 1
 }
@@ -152,7 +152,7 @@ install_tier2() {
     return
   fi
   brew_bundle "brew/Brewfile.tier2"
-  stow_tier "tier2"
+  stow_tier "workstation"
   post_install_checks 2
 }
 
