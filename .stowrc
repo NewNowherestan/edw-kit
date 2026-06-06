@@ -1,0 +1,3 @@
+--dir=dotfiles
+--target=~
+--verbose=1
