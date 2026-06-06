@@ -1,47 +1,74 @@
 # edw-kit
 
-`edw-kit` is a personal macOS/Linux bootstrap kit managed with GNU Stow.
+`edw-kit` is a profile-driven bootstrap kit for macOS and Linux.
 
-## Layout
+## Structure-first model
 
-- `brew/` tiered Brewfiles (`tier1`, `tier2`, `tier3`)
-- `dotfiles/tier1` and `dotfiles/tier2` mirror `$HOME` directly
-- `docs/` printable command cards/memos
-- `submodules/vimfiles` points to `https://github.com/DiskoGoth/vimfiles`
-- `dotfiles/hosts/<hostname>` optional host-specific overlay
+The repository is organized around dotfile profiles instead of script internals:
 
-## Install
+- `dotfiles/terminal` → shell/editor/terminal baseline
+- `dotfiles/workstation` → desktop/workstation layer
+- `dotfiles/hosts/<hostname>` → optional machine-specific overrides
 
-Bootstrap a fresh macOS machine (installs Homebrew if needed):
+Package installation remains split in Brewfile tiers:
+
+- `brew/Brewfile.tier1` (terminal)
+- `brew/Brewfile.tier2` (workstation)
+- `brew/Brewfile.tier3` (full/macOS extras)
+
+## Entry points
+
+### 1) Bootstrap environment
+
+Use this on fresh machines. It prepares platform prerequisites, installs Homebrew if needed, and then runs the installer:
 
 ```bash
 ./bootstrap.sh
 ```
 
-Default install is tier 1:
+Defaults:
+
+- macOS → `workstation`
+- Linux → `terminal`
+
+### 2) Apply profiles directly
 
 ```bash
-./install.sh
+./install.sh terminal
+./install.sh workstation
+./install.sh full
 ```
 
-Explicit tier:
+You can also use legacy aliases:
 
 ```bash
-./install.sh 2
-./install.sh 3
+./install.sh 1   # terminal
+./install.sh 2   # workstation
+./install.sh 3   # full
 ```
 
-Tier cascade is automatic:
+Useful flags:
 
-- tier 1: console
-- tier 2: tier 1 + workstation
-- tier 3: tier 1 + tier 2 + full
+```bash
+./install.sh --profile workstation --dry-run
+./install.sh --profile full --skip-brew
+./install.sh --profile terminal --skip-stow
+```
 
-The installer is idempotent (`brew bundle` + `stow --restow`) and writes logs to `~/.local/state/edw-kit/install.log`.
+Installer log:
 
-## Maintenance helpers
+`~/.local/state/edw-kit/install.log`
+
+## Helper scripts
+
+Lock all Brewfiles:
 
 ```bash
 ./scripts/lock-brewfiles.sh
+```
+
+Create local secrets scaffold (non-git):
+
+```bash
 ./scripts/secrets-bootstrap.sh
 ```
