@@ -23,11 +23,11 @@ main() {
   chmod 700 "${SECRETS_ROOT}" 2>/dev/null || true
 
   write_if_missing "${SECRETS_EXAMPLE_FILE}" \
-"# Copy to .env and fill with real values
+"# Copy to .env and fill with real values specific to your local setup.
 # Never commit this file.
 
-GITHUB_TOKEN=
-OPENAI_API_KEY=
+SERVICE_TOKEN=
+SERVICE_API_KEY=
 "
 
   write_if_missing "${SECRETS_ENV_FILE}" \

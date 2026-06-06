@@ -48,7 +48,7 @@ ensure_brew() {
     return
   fi
 
-  command -v git >/dev/null 2>&1 || die "git is required to initialize Homebrew installer"
+  command -v git >/dev/null 2>&1 || die "git is required to install Homebrew from the pinned submodule"
 
   say "→ installing Homebrew via pinned submodule"
   git -C "${ROOT_DIR}" submodule update --init submodules/homebrew-install

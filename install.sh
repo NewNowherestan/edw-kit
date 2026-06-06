@@ -143,11 +143,11 @@ setup_terminal_plugins() {
   mkdir -p "${plugins_dir}"
 
   link_submodule "${ROOT_DIR}/submodules/oh-my-zsh" "${HOME}/.oh-my-zsh"
-  link_submodule "${ROOT_DIR}/submodules/zsh-autosuggestions" "${plugins_dir}/zsh-autosuggestions"
-  link_submodule "${ROOT_DIR}/submodules/zsh-syntax-highlighting" "${plugins_dir}/zsh-syntax-highlighting"
-  link_submodule "${ROOT_DIR}/submodules/zsh-auto-notify" "${plugins_dir}/zsh-auto-notify"
-  link_submodule "${ROOT_DIR}/submodules/zsh-you-should-use" "${plugins_dir}/zsh-you-should-use"
-  link_submodule "${ROOT_DIR}/submodules/fzf-tab" "${plugins_dir}/fzf-tab"
+
+  local plugin
+  for plugin in zsh-autosuggestions zsh-syntax-highlighting zsh-auto-notify zsh-you-should-use fzf-tab; do
+    link_submodule "${ROOT_DIR}/submodules/${plugin}" "${plugins_dir}/${plugin}"
+  done
 }
 
 install_mas_apps() {
