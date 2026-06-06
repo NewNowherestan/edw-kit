@@ -29,11 +29,13 @@ Usage:
   ./install.sh --profile PROFILE [--dry-run] [--skip-brew] [--skip-stow]
 
 Profiles:
-  terminal      base shell + terminal tooling
+  shell         base shell
+  terminal      terminal tooling
   workstation   terminal + workstation layer (macOS-focused)
   full          workstation + full app layer
 
 Compatibility aliases:
+  0 -> shell
   1 -> terminal
   2 -> workstation
   3 -> full
@@ -42,6 +44,7 @@ EOF
 
 normalize_profile() {
   case "$1" in
+    0|shell) echo "shell" ;;
     1|terminal) echo "terminal" ;;
     2|workstation) echo "workstation" ;;
     3|full) echo "full" ;;
@@ -91,12 +94,13 @@ stow_profile() {
   [[ -d "${source_dir}" ]] || die "missing dotfiles profile directory: ${source_dir}"
 
   if [[ "${SKIP_STOW}" -eq 1 ]]; then
-    log "SKIP: stow dotfiles/${profile_name}"
+    log "SKIP: stow ${profine_name} from  dotfiles/${profile_name}"
     return
   fi
 
   require_cmd stow
-  run_step "stow dotfiles/${profile_name}" stow --restow --target="${HOME}" --dir="${ROOT_DIR}" "dotfiles/${profile_name}"
+  #TODO: output verbous
+  run_step "stow ${profile_name}" stow --restow --target="${HOME}" "${profile_name}"
 }
 
 host_overlay() {
@@ -127,31 +131,6 @@ link_submodule() {
   run_step "link $(basename "${target}")" ln -sfn "${source}" "${target}"
 }
 
-setup_terminal_plugins() {
-  require_cmd git
-  run_step "init shell-related submodules" \
-    git -C "${ROOT_DIR}" submodule update --init \
-      submodules/oh-my-zsh \
-      submodules/zsh-autosuggestions \
-      submodules/zsh-syntax-highlighting \
-      submodules/zsh-auto-notify \
-      submodules/zsh-you-should-use \
-      submodules/fzf-tab
-
-  local zsh_custom="${ZSH_CUSTOM:-${HOME}/.oh-my-zsh/custom}"
-  local plugins_dir="${zsh_custom}/plugins"
-  mkdir -p "${plugins_dir}"
-
-  link_submodule "${ROOT_DIR}/submodules/oh-my-zsh" "${HOME}/.oh-my-zsh"
-
-  local plugin
-  #TODO: use this list or for to init submodules as well
-  for plugin in zsh-autosuggestions zsh-syntax-highlighting zsh-auto-notify zsh-you-should-use fzf-tab; do
-      #TODO: cant we put this path directly into .gitmodules, so the ohmyzsh submodules will be installed directly into ohmyzsh? or even better, in the .gitmodules put them into dotfiles/termina/ right away... and make stow handle the links
-    link_submodule "${ROOT_DIR}/submodules/${plugin}" "${plugins_dir}/${plugin}"
-  done
-}
-
 install_mas_apps() {
   local app_1focus_id="1258530160"
   if ! command -v mas >/dev/null 2>&1; then
@@ -165,10 +144,15 @@ install_mas_apps() {
   run_step "mas install 1Focus" mas install "${app_1focus_id}"
 }
 
+install_shell() {
+    stow_profile "shell"
+}
+
 install_terminal() {
+    #TODO: add verbouse to brew_bundle or it looks like it is hanging
+  install_shell
   brew_bundle "brew/Brewfile.tier1"
   stow_profile "terminal"
-  setup_terminal_plugins
 }
 
 install_workstation() {
@@ -215,6 +199,7 @@ main() {
   parse_args "$@"
 
   case "${PROFILE}" in
+    shell) install_shell ;;
     terminal) install_terminal ;;
     workstation) install_workstation ;;
     full) install_full ;;

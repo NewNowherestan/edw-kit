@@ -79,6 +79,7 @@ main() {
       ;;
   esac
 
+
   ensure_brew
 
   if has_explicit_profile "$@"; then

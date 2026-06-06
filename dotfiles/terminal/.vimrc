@@ -210,7 +210,7 @@ let g:fuf_file_exclude = '\v\~$|\.(o|exe|dll|bak|orig|swp)$'
 \.'|(^|[/\\])\.(hg|git|bzr)($|[/\\])'
 \.'|(^|[/\\])(node_modules|libs|dist|build|web)[/\\]'
 
-set rnu
+" set rnu
 
 set complete=""
 set complete+=.
