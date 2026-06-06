@@ -2,80 +2,135 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-LOG_DIR="${HOME}/.local/state/edw-kit"
-LOG_FILE="${LOG_DIR}/install.log"
-TIER="${1:-1}"
+STATE_DIR="${HOME}/.local/state/edw-kit"
+LOG_FILE="${STATE_DIR}/install.log"
 
-mkdir -p "${LOG_DIR}"
+PROFILE="terminal"
+SKIP_BREW=0
+SKIP_STOW=0
+DRY_RUN=0
+
+mkdir -p "${STATE_DIR}"
 touch "${LOG_FILE}"
 
 log() {
   printf '[%s] %s\n' "$(date '+%Y-%m-%d %H:%M:%S')" "$*" | tee -a "${LOG_FILE}"
 }
 
+die() {
+  log "ERROR: $*"
+  exit 1
+}
+
+usage() {
+  cat <<'EOF'
+Usage:
+  ./install.sh [PROFILE]
+  ./install.sh --profile PROFILE [--dry-run] [--skip-brew] [--skip-stow]
+
+Profiles:
+  terminal      base shell + terminal tooling
+  workstation   terminal + workstation layer (macOS-focused)
+  full          workstation + full app layer
+
+Compatibility aliases:
+  1 -> terminal
+  2 -> workstation
+  3 -> full
+EOF
+}
+
+normalize_profile() {
+  case "$1" in
+    1|terminal) echo "terminal" ;;
+    2|workstation) echo "workstation" ;;
+    3|full) echo "full" ;;
+    *) return 1 ;;
+  esac
+}
+
 run_step() {
-  local title="$1"
+  local label="$1"
   shift
-  log "→ ${title}"
+  if [[ "${DRY_RUN}" -eq 1 ]]; then
+    log "DRY-RUN: ${label}"
+    return
+  fi
+  log "→ ${label}"
   "$@" >>"${LOG_FILE}" 2>&1
-  log "✓ ${title}"
+  log "✓ ${label}"
 }
 
 require_cmd() {
-  local cmd="$1"
-  if ! command -v "${cmd}" >/dev/null 2>&1; then
-    log "ERROR: required command '${cmd}' not found"
-    exit 1
-  fi
-}
-
-check_cmd_warn() {
-  local cmd="$1"
-  if ! command -v "${cmd}" >/dev/null 2>&1; then
-    log "WARN: command '${cmd}' not found in PATH"
-  fi
+  command -v "$1" >/dev/null 2>&1 || die "required command '$1' not found"
 }
 
 brew_bundle() {
   local file="$1"
+  if [[ "${SKIP_BREW}" -eq 1 ]]; then
+    log "SKIP: brew bundle ${file}"
+    return
+  fi
+  require_cmd brew
   run_step "brew bundle ${file}" brew bundle --file="${ROOT_DIR}/${file}"
 }
 
 brew_bundle_no_mas() {
   local file="$1"
+  if [[ "${SKIP_BREW}" -eq 1 ]]; then
+    log "SKIP: brew bundle ${file} (no mas)"
+    return
+  fi
+  require_cmd brew
   run_step "brew bundle ${file} (skip mas)" env HOMEBREW_BUNDLE_MAS_SKIP=1 brew bundle --file="${ROOT_DIR}/${file}"
 }
 
-stow_tier() {
-  local tier_name="$1"
-  run_step "stow dotfiles/${tier_name}" stow --restow --target="${HOME}" --dir="${ROOT_DIR}" "dotfiles/${tier_name}"
+stow_profile() {
+  local profile_name="$1"
+  local source_dir="${ROOT_DIR}/dotfiles/${profile_name}"
+  [[ -d "${source_dir}" ]] || die "missing dotfiles profile directory: ${source_dir}"
+
+  if [[ "${SKIP_STOW}" -eq 1 ]]; then
+    log "SKIP: stow dotfiles/${profile_name}"
+    return
+  fi
+
+  require_cmd stow
+  run_step "stow dotfiles/${profile_name}" stow --restow --target="${HOME}" --dir="${ROOT_DIR}" "dotfiles/${profile_name}"
 }
 
-stow_host_overlay() {
+host_overlay() {
+  if [[ "${SKIP_STOW}" -eq 1 ]]; then
+    return
+  fi
+
   local host_name
   if [[ "$(uname -s)" == "Darwin" ]] && command -v scutil >/dev/null 2>&1; then
     host_name="$(scutil --get LocalHostName 2>/dev/null || hostname -s)"
   else
     host_name="$(hostname -s)"
   fi
+
   local host_dir="${ROOT_DIR}/dotfiles/hosts/${host_name}"
   if [[ -d "${host_dir}" ]]; then
     run_step "stow dotfiles/hosts/${host_name}" stow --restow --target="${HOME}" --dir="${ROOT_DIR}/dotfiles/hosts" "${host_name}"
   fi
 }
 
-ensure_oh_my_zsh_plugins() {
-  local zsh_custom
-  if [[ -n "${ZSH_CUSTOM:-}" ]]; then
-    zsh_custom="${ZSH_CUSTOM}"
-  else
-    zsh_custom="${HOME}/.oh-my-zsh/custom"
+link_submodule() {
+  local source="$1"
+  local target="$2"
+  if [[ -e "${target}" && ! -L "${target}" ]]; then
+    log "WARN: ${target} exists and is not a symlink; keeping local version"
+    return
   fi
-  local plugins_dir="${zsh_custom}/plugins"
+  run_step "link $(basename "${target}")" ln -sfn "${source}" "${target}"
+}
 
-  # Initialise all plugin submodules (pinned SHAs, no ad-hoc HTTP clones)
-  run_step "submodule init: oh-my-zsh + plugins" \
-    git -C "${ROOT_DIR}" submodule update --init --depth=1 \
+setup_terminal_plugins() {
+  require_cmd git
+  run_step "init shell-related submodules" \
+    git -C "${ROOT_DIR}" submodule update --init \
       submodules/oh-my-zsh \
       submodules/zsh-autosuggestions \
       submodules/zsh-syntax-highlighting \
@@ -83,106 +138,89 @@ ensure_oh_my_zsh_plugins() {
       submodules/zsh-you-should-use \
       submodules/fzf-tab
 
-  if [[ ! -e "${HOME}/.oh-my-zsh" ]]; then
-    run_step "link oh-my-zsh" ln -sf "${ROOT_DIR}/submodules/oh-my-zsh" "${HOME}/.oh-my-zsh"
-  elif [[ ! -L "${HOME}/.oh-my-zsh" ]]; then
-    log "WARN: ${HOME}/.oh-my-zsh exists and is not a symlink — skipping link (preserve local install)"
-  fi
-
+  local zsh_custom="${ZSH_CUSTOM:-${HOME}/.oh-my-zsh/custom}"
+  local plugins_dir="${zsh_custom}/plugins"
   mkdir -p "${plugins_dir}"
 
-  for plugin in zsh-autosuggestions zsh-syntax-highlighting zsh-auto-notify zsh-you-should-use fzf-tab; do
-    local target="${plugins_dir}/${plugin}"
-    if [[ ! -e "${target}" ]]; then
-      run_step "link plugin: ${plugin}" ln -sf "${ROOT_DIR}/submodules/${plugin}" "${target}"
-    elif [[ ! -L "${target}" ]]; then
-      log "WARN: ${target} exists and is not a symlink — skipping link (preserve local install)"
-    fi
-  done
-}
-
-post_install_checks() {
-  local tier_name="$1"
-  case "${tier_name}" in
-    1)
-      check_cmd_warn zsh
-      check_cmd_warn tmux
-      check_cmd_warn stow
-      ;;
-    2)
-      if [[ "$(uname -s)" == "Darwin" ]]; then
-        [[ -d "/Applications/AeroSpace.app" ]] || log "WARN: AeroSpace.app missing"
-        [[ -d "/Applications/Karabiner-Elements.app" ]] || log "WARN: Karabiner-Elements.app missing"
-      fi
-      ;;
-    3)
-      if command -v mas >/dev/null 2>&1; then
-        if ! mas account >/dev/null 2>&1; then
-          log "WARN: App Store not signed in; skipping mas app installs"
-        fi
-      fi
-      ;;
-  esac
+  link_submodule "${ROOT_DIR}/submodules/oh-my-zsh" "${HOME}/.oh-my-zsh"
+  link_submodule "${ROOT_DIR}/submodules/zsh-autosuggestions" "${plugins_dir}/zsh-autosuggestions"
+  link_submodule "${ROOT_DIR}/submodules/zsh-syntax-highlighting" "${plugins_dir}/zsh-syntax-highlighting"
+  link_submodule "${ROOT_DIR}/submodules/zsh-auto-notify" "${plugins_dir}/zsh-auto-notify"
+  link_submodule "${ROOT_DIR}/submodules/zsh-you-should-use" "${plugins_dir}/zsh-you-should-use"
+  link_submodule "${ROOT_DIR}/submodules/fzf-tab" "${plugins_dir}/fzf-tab"
 }
 
 install_mas_apps() {
-  local mas_app_1focus_id="1258530160"
+  local app_1focus_id="1258530160"
   if ! command -v mas >/dev/null 2>&1; then
+    log "SKIP: mas is not installed"
     return
   fi
-  if mas account >/dev/null 2>&1; then
-    run_step "mas install 1Focus" mas install "${mas_app_1focus_id}"
-  else
-    log "SKIP: mas install (App Store not signed in)"
+  if ! mas account >/dev/null 2>&1; then
+    log "SKIP: App Store not signed in"
+    return
   fi
+  run_step "mas install 1Focus" mas install "${app_1focus_id}"
 }
 
-install_tier1() {
+install_terminal() {
   brew_bundle "brew/Brewfile.tier1"
-  require_cmd stow
-  stow_tier "terminal"
-  ensure_oh_my_zsh_plugins
-  post_install_checks 1
+  stow_profile "terminal"
+  setup_terminal_plugins
 }
 
-install_tier2() {
-  install_tier1
+install_workstation() {
+  install_terminal
   if [[ "$(uname -s)" != "Darwin" ]]; then
-    log "SKIP: tier2 is macOS-only"
+    log "SKIP: workstation layer is macOS-focused"
     return
   fi
   brew_bundle "brew/Brewfile.tier2"
-  stow_tier "workstation"
-  post_install_checks 2
+  stow_profile "workstation"
 }
 
-install_tier3() {
-  install_tier2
+install_full() {
+  install_workstation
   if [[ "$(uname -s)" != "Darwin" ]]; then
-    log "SKIP: tier3 is macOS-only"
+    log "SKIP: full layer is macOS-focused"
     return
   fi
   brew_bundle_no_mas "brew/Brewfile.tier3"
   install_mas_apps
-  post_install_checks 3
+}
+
+parse_args() {
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -p|--profile)
+        [[ $# -ge 2 ]] || die "missing value for $1"
+        PROFILE="$(normalize_profile "$2")" || die "invalid profile: $2"
+        shift 2
+        ;;
+      --skip-brew) SKIP_BREW=1; shift ;;
+      --skip-stow) SKIP_STOW=1; shift ;;
+      --dry-run) DRY_RUN=1; shift ;;
+      -h|--help) usage; exit 0 ;;
+      *)
+        PROFILE="$(normalize_profile "$1")" || die "invalid profile: $1"
+        shift
+        ;;
+    esac
+  done
 }
 
 main() {
-  require_cmd git
-  require_cmd brew
+  parse_args "$@"
 
-  case "${TIER}" in
-    1) install_tier1 ;;
-    2) install_tier2 ;;
-    3) install_tier3 ;;
-    *)
-      log "Usage: $0 [1|2|3]"
-      exit 1
-      ;;
+  case "${PROFILE}" in
+    terminal) install_terminal ;;
+    workstation) install_workstation ;;
+    full) install_full ;;
+    *) die "unsupported profile: ${PROFILE}" ;;
   esac
 
-  stow_host_overlay
-  log "Done. Log: ${LOG_FILE}"
+  host_overlay
+  log "Done (profile=${PROFILE}). Log: ${LOG_FILE}"
 }
 
 main "$@"
