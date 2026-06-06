@@ -145,7 +145,9 @@ setup_terminal_plugins() {
   link_submodule "${ROOT_DIR}/submodules/oh-my-zsh" "${HOME}/.oh-my-zsh"
 
   local plugin
+  #TODO: use this list or for to init submodules as well
   for plugin in zsh-autosuggestions zsh-syntax-highlighting zsh-auto-notify zsh-you-should-use fzf-tab; do
+      #TODO: cant we put this path directly into .gitmodules, so the ohmyzsh submodules will be installed directly into ohmyzsh? or even better, in the .gitmodules put them into dotfiles/termina/ right away... and make stow handle the links
     link_submodule "${ROOT_DIR}/submodules/${plugin}" "${plugins_dir}/${plugin}"
   done
 }

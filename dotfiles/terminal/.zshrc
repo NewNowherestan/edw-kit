@@ -16,7 +16,7 @@ plugins=(
   dirhistory
   extract
   zsh-autosuggestions
-  zsh-auto-notify
+  auto-notify
   zsh-you-should-use
   fzf-tab                # requires fzf (brew install fzf — included in tier1)
 )

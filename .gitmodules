@@ -1,24 +1,25 @@
 [submodule "submodules/homebrew-install"]
 	path = submodules/homebrew-install
 	url = https://github.com/Homebrew/install
-[submodule "submodules/zsh-autosuggestions"]
-	path = submodules/zsh-autosuggestions
-	url = https://github.com/zsh-users/zsh-autosuggestions
-[submodule "submodules/oh-my-zsh"]
-	path = submodules/oh-my-zsh
-	url = https://github.com/ohmyzsh/ohmyzsh
-[submodule "submodules/zsh-auto-notify"]
-	path = submodules/zsh-auto-notify
-	url = https://github.com/MichaelAquilina/zsh-auto-notify
-[submodule "submodules/zsh-you-should-use"]
-	path = submodules/zsh-you-should-use
-	url = https://github.com/MichaelAquilina/zsh-you-should-use
-[submodule "submodules/fzf-tab"]
-	path = submodules/fzf-tab
-	url = https://github.com/Aloxaf/fzf-tab
-[submodule "submodules/zsh-syntax-highlighting"]
-	path = submodules/zsh-syntax-highlighting
-	url = https://github.com/zsh-users/zsh-syntax-highlighting
+
 [submodule "opt/vim/bundle/Vundle.vim"]
 	path = opt/vim/bundle/Vundle.vim
 	url = https://github.com/VundleVim/Vundle.vim
+[submodule "dotfiles/shell/.oh-my-zsh"]
+	path = dotfiles/shell/.oh-my-zsh
+	url = https://github.com/ohmyzsh/ohmyzsh
+[submodule "dotfiles/terminal/.oh-my-zsh/custom/plugins/zsh-autosuggestions"]
+	path = dotfiles/terminal/.oh-my-zsh/custom/plugins/zsh-autosuggestions
+	url = https://github.com/zsh-users/zsh-autosuggestions
+[submodule "dotfiles/terminal/.oh-my-zsh/custom/plugins/auto-notify"]
+	path = dotfiles/terminal/.oh-my-zsh/custom/plugins/auto-notify
+	url = https://github.com/MichaelAquilina/zsh-auto-notify
+[submodule "dotfiles/terminal/.oh-my-zsh/custom/plugins/zsh-you-should-use"]
+	path = dotfiles/terminal/.oh-my-zsh/custom/plugins/zsh-you-should-use
+	url = https://github.com/MichaelAquilina/zsh-you-should-use
+[submodule "dotfiles/terminal/.oh-my-zsh/custom/plugins/fzf-tab"]
+	path = dotfiles/terminal/.oh-my-zsh/custom/plugins/fzf-tab
+	url = https://github.com/Aloxaf/fzf-tab
+[submodule "dotfiles/terminal/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting"]
+	path = dotfiles/terminal/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting
+	url = https://github.com/zsh-users/zsh-syntax-highlighting
