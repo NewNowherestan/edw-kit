@@ -77,7 +77,7 @@ set mouse=a
 set mousemodel=popup
 
 "set clipboard=exclude:.*
-set clipboard=unnamed
+set clipboard+=unnamed
 
 set hidden
 set nu
