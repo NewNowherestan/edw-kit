@@ -1,0 +1,127 @@
+# ==============================================================================
+# GHOSTTY CONFIGURATION
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# HOW TO COMMENT AND DISABLE FUNCTIONALITY
+# ------------------------------------------------------------------------------
+# - Use the '#' character at the beginning of a line to comment it out.
+# - To disable a specific setting, either comment it out or set it to its default value.
+# - Comments must be on their own line; trailing comments after a configuration value 
+#   are generally not supported in Ghostty's strict config format.
+# ------------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------------
+# GHOSTTY CONFIGURATION GOODNESS (Suggested Features)
+# ------------------------------------------------------------------------------
+# Ghostty is a fast, hardware-accelerated terminal emulator with a focus on 
+# modern features and sensible defaults. Here is why it's "goodness":
+#
+# 1. Performance: Uses Metal (on macOS) for low-latency rendering.
+# 2. Native Features: Supports modern terminal protocols (kitty graphics, etc.).
+# 3. Customizability: Clean configuration with support for almost everything.
+# 4. Reliability: Written in Zig, focusing on memory safety and speed.
+# ------------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------------
+# APPEARANCE & THEME
+# ------------------------------------------------------------------------------
+
+# Set the color scheme. Ghostty comes with many built-in themes.
+# Based on your 'mustangpp' vim theme, a dark professional theme is best.
+theme = dark:catppuccin-mocha,light:catppuccin-latte
+# Additional options: 'tomorrow-night', 'nord', 'gruvbox-dark'. 
+# You can run `ghostty +list-themes` to see all available options.
+
+# Selection style.
+selection-background = #444444
+selection-foreground = #ffffff
+# Matches a dark professional look.
+
+# ------------------------------------------------------------------------------
+# FONT SETTINGS
+# ------------------------------------------------------------------------------
+
+# Control the font family.
+font-family = "PragmataPro"
+# Your .vimrc uses PragmataPro 13. If not installed on the system, it will fallback.
+# Additional options: "JetBrains Mono", "Fira Code", "MesloLGS NF" (for Starship).
+
+# Font size in points.
+font-size = 13
+# Additional options: Any integer or float. Smaller for more screen real estate, larger for readability.
+
+# Window padding (inner margin).
+window-padding-x = 4
+window-padding-y = 4
+# Adds some breathing room between the text and the window border.
+
+# Background opacity.
+window-opacity = 0.95
+# 0.0 is fully transparent, 1.0 is fully opaque. 0.95 gives a subtle "modern" feel.
+
+# Blur the background behind the window (macOS only).
+window-blur = true
+# Makes transparent windows more readable.
+
+# ------------------------------------------------------------------------------
+# TERMINAL BEHAVIOR
+# ------------------------------------------------------------------------------
+
+# Use the option key as Alt/Meta. 
+# This is crucial for CLI tools like emacs, readline, or custom tmux/vim bindings.
+macos-option-as-alt = left
+# Options: 'none', 'left', 'right', 'both'. Most users prefer 'left'.
+
+# Cursor style.
+cursor-style = block
+# Options: 'block', 'ibeam', 'underline'.
+
+# Blinking cursor.
+cursor-style-blink = true
+# Makes the cursor easier to find in a busy terminal.
+
+# Shell integration.
+shell-integration = zsh
+# Enhances prompt awareness, cursor position reporting, etc. 
+# Works great with your Zsh setup.
+
+# ------------------------------------------------------------------------------
+# MOUSE & INTERACTION
+# ------------------------------------------------------------------------------
+
+# Automatically copy selected text to the clipboard.
+copy-on-select = true
+# Good for quick copy-pasting without CMD+C.
+
+# ------------------------------------------------------------------------------
+# SHELL & INTEGRATION
+# ------------------------------------------------------------------------------
+
+# Ghostty automatically handles shell integration for most shells, 
+# but you can explicitly define the command.
+command = /bin/zsh --login
+# Since you have a heavy Zsh setup, ensures it loads as a login shell.
+
+# ------------------------------------------------------------------------------
+# KEYBINDINGS
+# ------------------------------------------------------------------------------
+
+# Ghostty uses a simple keybinding syntax: keybind = combo=action
+
+# Quick reload of the configuration file.
+keybind = super+shift+r=reload_config
+# Very useful when tweaking your setup.
+
+# Tmux-like navigation (if you want to use Ghostty native splits alongside tmux).
+# keybind = ctrl+a>h=goto_split:left
+# keybind = ctrl+a>j=goto_split:bottom
+# keybind = ctrl+a>k=goto_split:top
+# keybind = ctrl+a>l=goto_split:right
+# These are commented out as you likely prefer tmux for splitting, but Ghostty 
+# supports sequences like iTerm2/Tmux.
+
+# Splitting panes (Native Ghostty splits).
+keybind = super+d=new_split:right
+keybind = super+shift+d=new_split:down
+# Similar to iTerm2 shortcuts for consistency.
