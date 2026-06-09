@@ -1,127 +1,242 @@
-# ==============================================================================
-# GHOSTTY CONFIGURATION
-# ==============================================================================
-
-# ------------------------------------------------------------------------------
-# HOW TO COMMENT AND DISABLE FUNCTIONALITY
-# ------------------------------------------------------------------------------
-# - Use the '#' character at the beginning of a line to comment it out.
-# - To disable a specific setting, either comment it out or set it to its default value.
-# - Comments must be on their own line; trailing comments after a configuration value 
-#   are generally not supported in Ghostty's strict config format.
-# ------------------------------------------------------------------------------
-
-# ------------------------------------------------------------------------------
-# GHOSTTY CONFIGURATION GOODNESS (Suggested Features)
-# ------------------------------------------------------------------------------
-# Ghostty is a fast, hardware-accelerated terminal emulator with a focus on 
-# modern features and sensible defaults. Here is why it's "goodness":
+# =============================================================================
+# Ghostty Configuration
+# ~/.config/ghostty/config
 #
-# 1. Performance: Uses Metal (on macOS) for low-latency rendering.
-# 2. Native Features: Supports modern terminal protocols (kitty graphics, etc.).
-# 3. Customizability: Clean configuration with support for almost everything.
-# 4. Reliability: Written in Zig, focusing on memory safety and speed.
-# ------------------------------------------------------------------------------
+# HOW TO USE THIS FILE
+# --------------------
+# - Live reload:        Cmd+Shift+,  (no restart needed for most options)
+# - Explore all opts:   ghostty +show-config --default --docs | less
+# - List themes:        ghostty +list-themes
+# - List fonts:         ghostty +list-fonts
+#
+# COMMENTING & DISABLING
+# ----------------------
+# Comment out a line by prepending #
+#   font-size = 14       ← active
+#   # font-size = 14     ← disabled
+#
+# Multiple values for the same key are ADDITIVE (e.g. keybind, palette).
+# To override a key that was set earlier, you can use the special value:
+#   keybind = clear    ← clears ALL previously set keybinds
+#
+# To reset a single option back to its default, prefix with !:
+#   font-size = !       ← resets font-size to Ghostty default
+#
+# Config is re-read on Cmd+Shift+,  — no need to restart Ghostty.
+# Errors show in Ghostty's log: ghostty +show-config will surface them.
+# =============================================================================
 
-# ------------------------------------------------------------------------------
-# APPEARANCE & THEME
-# ------------------------------------------------------------------------------
 
-# Set the color scheme. Ghostty comes with many built-in themes.
-# Based on your 'mustangpp' vim theme, a dark professional theme is best.
-theme = dark:catppuccin-mocha,light:catppuccin-latte
-# Additional options: 'tomorrow-night', 'nord', 'gruvbox-dark'. 
-# You can run `ghostty +list-themes` to see all available options.
+# =============================================================================
+# BLOCK 1 — YOUR ACTIVE CONFIGURATION
+# Tuned to match your existing Monaco/iTerm2 setup:
+#   - Monaco 12 font (same as iTerm2 profile)
+#   - Near-white light background with subtle transparency + blur
+#   - vi-style selection, mouse, tmux 256color handshake
+#   - Quick terminal on Ctrl+` and Ctrl+§ (your iTerm2 hotkeys)
+# =============================================================================
 
-# Selection style.
-selection-background = #444444
-selection-foreground = #ffffff
-# Matches a dark professional look.
-
-# ------------------------------------------------------------------------------
-# FONT SETTINGS
-# ------------------------------------------------------------------------------
-
-# Control the font family.
-font-family = "PragmataPro"
-# Your .vimrc uses PragmataPro 13. If not installed on the system, it will fallback.
-# Additional options: "JetBrains Mono", "Fira Code", "MesloLGS NF" (for Starship).
-
-# Font size in points.
+# --- Font ------------------------------------------------------------------
+# Monaco is what your iTerm2 profile uses. Ghostty will pick it up directly.
+# Run `ghostty +list-fonts` to confirm it's found.
+font-family = Monaco
 font-size = 13
-# Additional options: Any integer or float. Smaller for more screen real estate, larger for readability.
 
-# Window padding (inner margin).
-window-padding-x = 4
-window-padding-y = 4
-# Adds some breathing room between the text and the window border.
+# Slightly bolder rendering on Retina — makes Monaco at 13pt feel sharper.
+font-thicken = true
 
-# Background opacity.
-window-opacity = 0.95
-# 0.0 is fully transparent, 1.0 is fully opaque. 0.95 gives a subtle "modern" feel.
+# Disable ligatures — Monaco has none, this is a no-op but explicit is good.
+font-feature = -liga
+font-feature = -calt
 
-# Blur the background behind the window (macOS only).
-window-blur = true
-# Makes transparent windows more readable.
+# --- Theme & Colors --------------------------------------------------------
+# Auto-switches between light and dark following macOS appearance.
+# Your iTerm2 profile is light-bg (RGB ~0.98,0.98,0.98) with dark fg (~0.06).
+# Catppuccin Latte is the closest maintained match.
+# Swap to:  theme = Tokyo Night  or  theme = Gruvbox Light  if you prefer.
+theme = dark:Catppuccin Mocha,light:Catppuccin Latte
 
-# ------------------------------------------------------------------------------
-# TERMINAL BEHAVIOR
-# ------------------------------------------------------------------------------
+# --- Transparency & Blur ---------------------------------------------------
+# Your iTerm2 profile has transparency = 0.249 and blur radius ~6.5.
+# Ghostty background-opacity is 0.0 (fully transparent) to 1.0 (opaque).
+background-opacity = 0.92
+background-blur-radius = 8
 
-# Use the option key as Alt/Meta. 
-# This is crucial for CLI tools like emacs, readline, or custom tmux/vim bindings.
-macos-option-as-alt = left
-# Options: 'none', 'left', 'right', 'both'. Most users prefer 'left'.
-
-# Cursor style.
+# --- Cursor ----------------------------------------------------------------
 cursor-style = block
-# Options: 'block', 'ibeam', 'underline'.
+cursor-style-blink = false
 
-# Blinking cursor.
-cursor-style-blink = true
-# Makes the cursor easier to find in a busy terminal.
+# Your iTerm2 profile shows a cursor guide (horizontal highlight line).
+# Ghostty equivalent:
+cursor-invert-fg-bg = true
 
-# Shell integration.
+# --- Window ----------------------------------------------------------------
+# Matches your iTerm2 profile window feel.
+window-padding-x = 8
+window-padding-y = 6
+window-padding-balance = true
+window-padding-color = background
+
+# Transparent titlebar so window chrome blends with terminal background.
+macos-titlebar-style = transparent
+
+# Keep window proportional when resizing (snaps to cell boundaries).
+window-step-resize = true
+
+# Retina/HiDPI — always on for modern Macs.
+# macos-option-as-alt = left   ← uncomment if you want Option as Meta (Alt)
+
+# --- Scrollback ------------------------------------------------------------
+# Your tmux.conf sets history-limit = 10000.
+# Ghostty's scrollback is separate (before content enters tmux).
+scrollback-limit = 10000
+
+# --- Shell Integration -----------------------------------------------------
+# Ghostty has its own shell integration (marks, semantic prompts).
+# It coexists with iTerm2 shell integration but you should pick one.
+# If you keep iTerm2 integration in .zshrc, disable Ghostty's cursor tracking:
 shell-integration = zsh
-# Enhances prompt awareness, cursor position reporting, etc. 
-# Works great with your Zsh setup.
+shell-integration-features = no-cursor
 
-# ------------------------------------------------------------------------------
-# MOUSE & INTERACTION
-# ------------------------------------------------------------------------------
+# --- Mouse -----------------------------------------------------------------
+# Your tmux.conf has `set -g mouse on`. Ghostty passes mouse events through.
+mouse-hide-while-typing = true
+focus-follows-mouse = false
 
-# Automatically copy selected text to the clipboard.
-copy-on-select = true
-# Good for quick copy-pasting without CMD+C.
+# --- Bell ------------------------------------------------------------------
+# Your tmux.conf: `set -g bell-action none`
+bell-features = false
 
-# ------------------------------------------------------------------------------
-# SHELL & INTEGRATION
-# ------------------------------------------------------------------------------
+# --- Quick Terminal (Quake / Dropdown) ------------------------------------
+# Slides in from the TOP of the screen, full width, 65% height.
+# Matches your iTerm2 hotkey window setup (top, full width, autohide).
+#
+# Ctrl+` is the primary trigger (same family as your iTerm2 Cmd+` hotkey).
+# Ctrl+§ is the alternate (§ = key code 10 = what's in your iTerm2 profile
+#          as HotKey Alternate Shortcuts keyCode 10).
+# `global:` prefix means it works even when Ghostty is not focused.
+keybind = global:ctrl+grave_accent=toggle_quick_terminal
+keybind = global:ctrl+section=toggle_quick_terminal
 
-# Ghostty automatically handles shell integration for most shells, 
-# but you can explicitly define the command.
-command = /bin/zsh --login
-# Since you have a heavy Zsh setup, ensures it loads as a login shell.
+quick-terminal-position = top
+quick-terminal-screen = main
+quick-terminal-size = 65%,100%
+quick-terminal-animation-duration = 0.15
+# Session persists when hidden — your tmux session stays alive.
 
-# ------------------------------------------------------------------------------
-# KEYBINDINGS
-# ------------------------------------------------------------------------------
+# --- tmux Compatibility ----------------------------------------------------
+# Your tmux.conf uses `set -g default-terminal tmux-256color` and
+# `set-option -sa terminal-features ,xtermRGB`.
+# Tell Ghostty to announce itself as xterm-256color so tmux's
+# terminal-features rule fires correctly.
+term = xterm-256color
 
-# Ghostty uses a simple keybinding syntax: keybind = combo=action
 
-# Quick reload of the configuration file.
-keybind = super+shift+r=reload_config
-# Very useful when tweaking your setup.
+# =============================================================================
+# BLOCK 2 — GHOSTTY GOODNESS (suggested, all commented out)
+# Uncomment what interests you. Each block explains WHY it's good.
+# =============================================================================
 
-# Tmux-like navigation (if you want to use Ghostty native splits alongside tmux).
-# keybind = ctrl+a>h=goto_split:left
-# keybind = ctrl+a>j=goto_split:bottom
-# keybind = ctrl+a>k=goto_split:top
-# keybind = ctrl+a>l=goto_split:right
-# These are commented out as you likely prefer tmux for splitting, but Ghostty 
-# supports sequences like iTerm2/Tmux.
+# --- Split Panes (Ghostty native, no tmux needed for simple splits) --------
+# Ghostty has GPU-accelerated native splits. Useful for quick tasks where
+# spinning up a full tmux layout is overkill.
+#
+# keybind = super+d=new_split:right          # ⌘D  → vertical split
+# keybind = super+shift+d=new_split:down     # ⌘⇧D → horizontal split
+# keybind = super+shift+enter=toggle_split_zoom  # zoom current split
+# keybind = super+alt+left=goto_split:left
+# keybind = super+alt+right=goto_split:right
+# keybind = super+alt+up=goto_split:up
+# keybind = super+alt+down=goto_split:down
+# split-divider-color = #3a3a3a
 
-# Splitting panes (Native Ghostty splits).
-keybind = super+d=new_split:right
-keybind = super+shift+d=new_split:down
-# Similar to iTerm2 shortcuts for consistency.
+# --- Tab Bar ---------------------------------------------------------------
+# Ghostty tabs are lightweight. `macos-titlebar-style = tabs` moves tabs
+# INTO the title bar — very clean, saves vertical space.
+#
+# macos-titlebar-style = tabs   # replaces `transparent` above — pick one
+
+# --- Minimum Contrast ------------------------------------------------------
+# Ensures dim/muted text is always readable even with transparency.
+# Value is a contrast ratio multiplier (1 = no enforcement, 1.1 = gentle push).
+#
+# minimum-contrast = 1.1
+
+# --- Unfocused Split Dimming -----------------------------------------------
+# When you have splits, the inactive ones dim slightly — makes focus obvious.
+# Good if you use native Ghostty splits alongside tmux panes.
+#
+# unfocused-split-opacity = 0.75
+
+# --- Link Detection --------------------------------------------------------
+# Cmd+click URLs in terminal output open in browser.
+# On by default. Disable if you find it interferes with vim mouse clicks.
+#
+link-url = true
+
+# --- Clipboard -------------------------------------------------------------
+# Ghostty can auto-copy selection to clipboard (like iTerm2's "copy on select").
+# This DOES stack with tmux's pbcopy pipe — tmux copy-mode writes clipboard,
+# Ghostty selection (outside copy mode) also writes clipboard.
+#
+# copy-on-select = clipboard   # auto-copy on mouse selection
+clipboard-read = allow
+clipboard-write = allow
+
+# --- Image Protocol (kitty) ------------------------------------------------
+# Ghostty natively supports the kitty graphics protocol.
+# This means `imgcat`-style inline images work WITHOUT iTerm2 shell integration.
+# Pairs with tools like: viu, timg, chafa, wezterm imgcat.
+# No config needed — it's on by default. Shown here so you know it exists.
+#
+# (no option to set — just use `viu image.png` or `timg image.png`)
+
+# --- GPU Renderer Tuning ---------------------------------------------------
+# Ghostty is Metal-accelerated on macOS. These are rarely needed but useful
+# for multi-monitor or high-refresh setups.
+#
+# window-vsync = true                  # default on, disable for max FPS
+# gtk-single-instance = false          # Linux only — ignore on macOS
+
+# --- Font Alternatives (uncomment to try, keep Monaco as fallback) ---------
+# These all work great with tmux powerline glyphs and Starship prompt.
+# Run `ghostty +list-fonts` first to confirm they're installed.
+#
+font-family = "JetBrains Mono"       # excellent hinting, free
+# font-family = "Berkeley Mono"        # premium, very popular in 2025-26
+# font-family = "Monaspace Neon"       # GitHub's font, has texture healing
+# font-family = "Maple Mono NF"        # great Nerd Font, ligature-friendly
+
+# --- Nerd Fonts / Powerline ------------------------------------------------
+# If you install a Nerd Font variant, Starship prompt and tmux powerline
+# themes use the glyph fallback chain automatically.
+# No config needed — Ghostty finds Nerd Font patches in fallback order.
+# To force a specific Nerd Font patch:
+#
+# font-family = "MesloLGS NF"          # commonly used with powerlevel10k
+
+# --- Auto-update -----------------------------------------------------------
+# Ghostty can check for updates on macOS. Disabled by default.
+#
+# auto-update = check                  # notify only, don't auto-install
+auto-update = download
+
+# --- Window Save/Restore ---------------------------------------------------
+# Remember window size and position between launches.
+#
+# window-save-state = always
+
+# --- macOS App Icon --------------------------------------------------------
+# Ghostty ships multiple icon styles. Aesthetic only.
+# Options: official, blueprint, chalkboard, microchip, glass,
+#          holographic, paper, retro, xray
+#
+# macos-icon = retro
+
+# --- Confirm Quit ----------------------------------------------------------
+# Ask before closing a window with running processes.
+# Your iTerm2 profile has `Prompt Before Closing 2 = false` — matching here.
+#
+confirm-close-surface = false
+
+quit-after-last-window-closed = true
