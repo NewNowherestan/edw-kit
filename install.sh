@@ -75,7 +75,7 @@ brew_bundle() {
     return
   fi
   require_cmd brew
-  run_step "brew bundle ${file}" brew bundle --file="${ROOT_DIR}/${file}"
+  run_step "brew bundle ${file}" brew bundle --verbose --file="${ROOT_DIR}/${file}"
 }
 
 brew_bundle_no_mas() {
@@ -85,7 +85,7 @@ brew_bundle_no_mas() {
     return
   fi
   require_cmd brew
-  run_step "brew bundle ${file} (skip mas)" env HOMEBREW_BUNDLE_MAS_SKIP=1 brew bundle --file="${ROOT_DIR}/${file}"
+  run_step "brew bundle ${file} (skip mas)" env HOMEBREW_BUNDLE_MAS_SKIP=1 brew bundle --verbose --file="${ROOT_DIR}/${file}"
 }
 
 stow_profile() {
@@ -99,8 +99,7 @@ stow_profile() {
   fi
 
   require_cmd stow
-  #TODO: output verbous
-  run_step "stow ${profile_name}" stow --restow --target="${HOME}" "${profile_name}"
+  run_step "stow ${profile_name}" stow --verbose --restow --target="${HOME}" "${profile_name}"
 }
 
 host_overlay() {
@@ -149,7 +148,6 @@ install_shell() {
 }
 
 install_terminal() {
-    #TODO: add verbouse to brew_bundle or it looks like it is hanging
   install_shell
   brew_bundle "brew/Brewfile.tier1"
   stow_profile "terminal"

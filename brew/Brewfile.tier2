@@ -6,7 +6,7 @@ cask "karabiner-elements"     # Key remapping — Caps Lock → layout/input swi
 cask "hammerspoon"            # macOS automation via Lua — hotkeys, window rules
 
 # ── Terminal ─────────────────────────────────────────────────────────────────
-cask "alacritty"              # GPU-accelerated terminal — config-driven, fast
+cask "ghostty"
 
 # ── Productivity ─────────────────────────────────────────────────────────────
 cask "stats"                  # System stats in menu bar — CPU, RAM, network

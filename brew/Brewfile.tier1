@@ -6,6 +6,7 @@ brew "tmux"                   # Terminal multiplexer — persistent sessions, pa
 brew "starship"               # Cross-shell prompt — fast, git-aware
 brew "stow"                   # Symlink farm manager — how edw-kit installs itself
 brew "thefuck"
+brew "cmatrix"
 
 # ── Editor ───────────────────────────────────────────────────────────────────
 brew "vim"                    # Classic editor — always available as fallback
