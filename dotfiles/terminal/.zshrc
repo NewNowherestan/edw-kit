@@ -71,22 +71,29 @@ ZSH_THEME="robbyrussell"
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(
-  git
-  history-substring-search
-  zsh-syntax-highlighting
-  aliases
-  tmux
-  docker
-  copypath
-  copyfile
-  macos
-  iterm2
-  dirhistory
-  extract
-  zsh-autosuggestions
-  auto-notify
-  zsh-you-should-use
-  fzf-tab                # requires fzf (brew install fzf — included in tier1)
+    git
+    history-substring-search
+    zsh-syntax-highlighting
+    aliases
+    tmux
+    docker
+    copypath
+    copyfile
+    macos
+    iterm2
+    dirhistory
+    extract
+    zsh-autosuggestions
+    auto-notify
+    zsh-you-should-use
+    fzf-tab                # requires fzf (brew install fzf — included in tier1)
+
+    branch
+    colored-man-pages
+    man
+    thefuck
+    vi-mode
+    zoxide
 )
 
 source $ZSH/oh-my-zsh.sh

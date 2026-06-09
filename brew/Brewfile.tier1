@@ -5,6 +5,7 @@ brew "zsh"
 brew "tmux"                   # Terminal multiplexer — persistent sessions, panes
 brew "starship"               # Cross-shell prompt — fast, git-aware
 brew "stow"                   # Symlink farm manager — how edw-kit installs itself
+brew "thefuck"
 
 # ── Editor ───────────────────────────────────────────────────────────────────
 brew "vim"                    # Classic editor — always available as fallback
@@ -46,7 +47,7 @@ brew "tldr"                   # Simplified man pages — practical examples
 brew "cheat"                  # Community cheatsheets for common commands
 brew "direnv"                 # Auto-load .envrc on cd — per-project env vars
 brew "entr"                   # Run commands on file change — lightweight watch
-brew "just"                   # Command runner / Makefile alternative
+# brew "just"                   # Command runner / Makefile alternative
 # brew "age"                  # Simple modern file encryption (uncomment if needed)
 # brew "gnupg"                # GPG — signing, encryption (uncomment if needed)
 brew "ffmpeg"                 # Video/audio processing — transcoding, screenshots

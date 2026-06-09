@@ -1,0 +1,10 @@
+        arduino-cli
+    autoenv
+    brew
+        chezmoi
+        emoji
+        magic-enter
+        pre-commit
+        task
+        tldr
+        tmux-cssh
