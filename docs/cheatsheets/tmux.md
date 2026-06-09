@@ -39,7 +39,6 @@ C-a &         kill window (confirm)
 C-a |         split right (vertical)
 C-a -         split down (horizontal)
 C-a h/j/k/l   navigate left/down/up/right
-C-a z         zoom pane fullscreen (toggle)
 C-a !         break pane into its own window
 C-a q         show pane numbers
 C-a x         kill pane

@@ -61,7 +61,8 @@ font-feature = -calt
 # Catppuccin Latte matches your iTerm2 light background (~RGB 0.98).
 # Catppuccin Mocha matches your iTerm2 dark background (~RGB 0.08).
 # To use a single fixed theme instead: theme = Catppuccin Mocha
-theme = dark:catppuccin Mocha,light:catppuccin Latte
+# theme = dark:catppuccin Mocha,light:catppuccin Latte
+theme = Tomorrow Night
 
 
 # --- Transparency & Blur ---------------------------------------------------
@@ -282,3 +283,4 @@ font-family = JetBrains Mono
 
 # Launch command — connect to tmux main session, or create it if it doesn't exist
 command = /opt/homebrew/bin/tmux new-session -A -s main
+initial-window = false
