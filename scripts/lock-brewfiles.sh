@@ -25,9 +25,9 @@ lock_file() {
 main() {
   require_cmd brew
 
-  lock_file "${BREW_DIR}/Brewfile.tier1"
-  lock_file "${BREW_DIR}/Brewfile.tier2"
-  lock_file "${BREW_DIR}/Brewfile.tier3"
+  lock_file "${BREW_DIR}/Brewfile.terminal"
+  lock_file "${BREW_DIR}/Brewfile.workstation"
+  lock_file "${BREW_DIR}/Brewfile.full"
 
   echo "Done."
 }

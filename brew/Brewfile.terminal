@@ -1,4 +1,4 @@
-# brew bundle --file=brew/Brewfile.tier1
+# brew bundle --file=brew/Brewfile.terminal
 
 # ── Shell ────────────────────────────────────────────────────────────────────
 brew "zsh"

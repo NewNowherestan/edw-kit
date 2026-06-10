@@ -12,9 +12,9 @@ The repository is organized around dotfile profiles instead of script internals:
 
 Package installation remains split in Brewfile tiers:
 
-- `brew/Brewfile.tier1` (terminal)
-- `brew/Brewfile.tier2` (workstation)
-- `brew/Brewfile.tier3` (full/macOS extras)
+- `brew/Brewfile.terminal` (terminal)
+- `brew/Brewfile.workstation` (workstation)
+- `brew/Brewfile.full` (full/macOS extras)
 
 ## Entry points
 

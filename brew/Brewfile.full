@@ -1,4 +1,4 @@
-# brew bundle --file=brew/Brewfile.tier3
+# brew bundle --file=brew/Brewfile.full
 
 cask "telegram"
 cask "obs"                    # Screen recording and live streaming

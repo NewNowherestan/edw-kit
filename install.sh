@@ -149,7 +149,7 @@ install_shell() {
 
 install_terminal() {
   install_shell
-  brew_bundle "brew/Brewfile.tier1"
+  brew_bundle "brew/Brewfile.terminal"
   stow_profile "terminal"
 }
 
@@ -159,7 +159,7 @@ install_workstation() {
     log "SKIP: workstation layer is macOS-focused"
     return
   fi
-  brew_bundle "brew/Brewfile.tier2"
+  brew_bundle "brew/Brewfile.workstation"
   stow_profile "workstation"
 }
 
@@ -169,7 +169,7 @@ install_full() {
     log "SKIP: full layer is macOS-focused"
     return
   fi
-  brew_bundle_no_mas "brew/Brewfile.tier3"
+  brew_bundle_no_mas "brew/Brewfile.full"
   install_mas_apps
 }
 

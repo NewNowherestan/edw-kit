@@ -171,8 +171,8 @@ mas upgrade
 ```bash
 ./install.sh [PROFILE]       # full install/update
 ./setup-env.sh               # post-install setup (direnv, tmux, ghostty)
-brew bundle --file=brew/Brewfile.tier1
-brew bundle --file=brew/Brewfile.tier2
-brew bundle --file=brew/Brewfile.tier3
+brew bundle --file=brew/Brewfile.terminal
+brew bundle --file=brew/Brewfile.workstation
+brew bundle --file=brew/Brewfile.full
 brew upgrade && brew cleanup
 ```

@@ -21,7 +21,7 @@
 ## Modern directions to evolve
 
 - Add a non-interactive `bootstrap.sh` that installs Homebrew if missing, then invokes `install.sh`.
-- Add `Brewfile.lock.json` workflow (`brew bundle lock --file=brew/Brewfile.tier1`, etc.) for reproducibility.
+- Add `Brewfile.lock.json` workflow (`brew bundle lock --file=brew/Brewfile.terminal`, etc.) for reproducibility.
 - Add optional secrets/environment bootstrap (`1Password CLI`, `chezmoi` templates, or `age` encrypted files).
 - Add per-tier post-install health checks (verify binaries, permissions, and config links).
 - Add a lightweight CI job that validates shell script syntax and Brewfile parseability.

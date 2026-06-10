@@ -1,4 +1,4 @@
-# brew bundle --file=brew/Brewfile.tier2
+# brew bundle --file=brew/Brewfile.workstation
 
 # ── Window & input ───────────────────────────────────────────────────────────
 tap "nikitabobko/tap"
