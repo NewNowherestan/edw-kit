@@ -11,6 +11,7 @@ cask "ghostty"
 
 # ── Productivity ─────────────────────────────────────────────────────────────
 cask "stats"                  # System stats in menu bar — CPU, RAM, network
+cask "maccy"
 
 # ── Fonts ────────────────────────────────────────────────────────────────────
 cask "font-jetbrains-mono-nerd-font"
