@@ -145,7 +145,7 @@ term = xterm-256color
 # Animation: 0.15s — snappy but smooth.
 # The session persists when hidden — your tmux stays alive.
 quick-terminal-position = top
-quick-terminal-screen = main
+quick-terminal-screen = macos-menu-bar
 quick-terminal-size = 65%,100%
 quick-terminal-animation-duration = 0.15
 
