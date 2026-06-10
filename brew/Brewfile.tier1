@@ -36,6 +36,10 @@ brew "duf"                    # df replacement — cleaner disk info
 brew "curl"
 brew "wget"
 brew "httpie"                 # Human-friendly HTTP client — quick API testing
+brew "gping"
+brew "trippy"
+brew "bandwhich"
+brew "gruyere"
 
 # ── Data & text ──────────────────────────────────────────────────────────────
 brew "jq"                     # JSON processor — essential for scripts and APIs

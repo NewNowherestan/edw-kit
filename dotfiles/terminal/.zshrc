@@ -151,3 +151,4 @@ export NVM_DIR="$HOME/.nvm"
 export TASKWARRIOR_TUI_TASKWARRIOR_CLI="/opt/homebrew/opt/task/bin/task"
 
 bindkey '^U' backward-kill-line
+bindkey '^N' end-of-line
