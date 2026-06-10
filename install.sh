@@ -207,6 +207,7 @@ main() {
   esac
 
   host_overlay
+  run_step "setup environment" "${ROOT_DIR}/setup-env.sh"
   log "Done (profile=${PROFILE}). Log: ${LOG_FILE}"
 }
 

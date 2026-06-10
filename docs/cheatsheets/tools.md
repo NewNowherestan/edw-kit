@@ -169,6 +169,8 @@ mas upgrade
 
 ## Install/Update Reminders
 ```bash
+./install.sh [PROFILE]       # full install/update
+./setup-env.sh               # post-install setup (direnv, tmux, ghostty)
 brew bundle --file=brew/Brewfile.tier1
 brew bundle --file=brew/Brewfile.tier2
 brew bundle --file=brew/Brewfile.tier3
