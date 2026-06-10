@@ -49,9 +49,12 @@ brew "cheat"                  # Community cheatsheets for common commands
 brew "direnv"                 # Auto-load .envrc on cd — per-project env vars
 brew "entr"                   # Run commands on file change — lightweight watch
 # brew "just"                   # Command runner / Makefile alternative
-# brew "age"                  # Simple modern file encryption (uncomment if needed)
+brew "age"                  # Simple modern file encryption (uncomment if needed)
 # brew "gnupg"                # GPG — signing, encryption (uncomment if needed)
 brew "ffmpeg"                 # Video/audio processing — transcoding, screenshots
 brew "yt-dlp"                 # Download video/audio from YouTube and 500+ sites
 
 brew "glow"                   # Markdown reader in terminal
+
+# ── tools -───────────────────────────────────────────────────────────────────
+brew "taskwarrior-tui"
