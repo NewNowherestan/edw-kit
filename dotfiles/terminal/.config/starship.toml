@@ -1,0 +1,64 @@
+"$schema" = 'https://starship.rs/config-schema.json'
+
+add_newline = false
+scan_timeout = 10
+command_timeout = 500
+
+# ── Palette: Tomorrow Night ────────────────────────────
+palette = "tomorrow_night"
+
+[palettes.tomorrow_night]
+fg       = "#c5c8c6"
+muted    = "#969896"
+red      = "#cc6666"
+yellow   = "#f0c674"
+green    = "#b5bd68"
+blue     = "#81a2be"
+purple   = "#b294bb"
+aqua     = "#8abeb7"
+
+# ── Directory ──────────────────────────────────────────
+[directory]
+style = "blue bold"
+truncation_length = 4
+
+# ── Git ────────────────────────────────────────────────
+[git_branch]
+style = "purple"
+
+[git_status]
+style = "yellow"
+ahead = "↑${count}"
+behind = "↓${count}"
+diverged = "↕"
+
+# ── Java ───────────────────────────────────────────────
+[java]
+style = "muted"
+
+# ── Docker ─────────────────────────────────────────────
+[docker_context]
+style = "blue"
+
+# ── AWS ────────────────────────────────────────────────
+[aws]
+style = "yellow"
+format = '[$symbol($profile)(\[$duration\])]($style) '
+
+# ── Battery ────────────────────────────────────────────
+[battery]
+full_symbol = "󰁹"
+discharging_symbol = "󰂀"
+
+[[battery.display]]
+threshold = 30
+style = "red"
+
+# ── Command Duration ───────────────────────────────────
+[cmd_duration]
+min_time = 3000
+style = "muted"
+
+# ── Character ──────────────────────────────────────────
+[character]
+error_symbol = "[❯](red bold)"
