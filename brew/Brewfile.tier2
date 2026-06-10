@@ -1,7 +1,8 @@
 # brew bundle --file=brew/Brewfile.tier2
 
 # ── Window & input ───────────────────────────────────────────────────────────
-cask "aerospace"              # Tiling window manager — i3-inspired, keyboard-driven
+tap "nikitabobko/tap"
+cask "nikitabobko/tap/aerospace"              # Tiling window manager — i3-inspired, keyboard-driven
 cask "karabiner-elements"     # Key remapping — Caps Lock → layout/input switch
 cask "hammerspoon"            # macOS automation via Lua — hotkeys, window rules
 

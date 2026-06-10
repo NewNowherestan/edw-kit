@@ -196,6 +196,8 @@ parse_args() {
 main() {
   parse_args "$@"
 
+  log "Starting (profile=${PROFILE}). Log: ${LOG_FILE}"
+
   case "${PROFILE}" in
     shell) install_shell ;;
     terminal) install_terminal ;;
