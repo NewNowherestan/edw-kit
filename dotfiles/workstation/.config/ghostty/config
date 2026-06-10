@@ -191,7 +191,8 @@ keybind = global:ctrl+grave_accent=toggle_quick_terminal
 # Auto-copies any mouse selection to clipboard, like iTerm2 "copy on select".
 # Stacks fine with tmux copy-mode pbcopy binding.
 #
-# copy-on-select = clipboard
+#
+copy-on-select = clipboard
 clipboard-read = allow
 clipboard-write = allow
 
@@ -284,3 +285,5 @@ font-family = JetBrains Mono
 # Launch command — connect to tmux main session, or create it if it doesn't exist
 command = /opt/homebrew/bin/tmux new-session -A -s main
 initial-window = false
+
+keybind = super+shift+r=reload_config
