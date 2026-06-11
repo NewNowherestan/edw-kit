@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
+set -u
+
 # ~/.config/tmux/autolayout.sh
-# Usage (from hook): autolayout.sh <session> <window> [init]
+# Usage: autolayout.sh <session> <window> [init|layout|reinit]
 #
-# Pane topology (session "main", window "dynamic"):
+# Managed pane topology:
 #
 #   ┌──────┬────────┬────────┐
 #   │      │   L    │   R    │
@@ -10,24 +12,32 @@
 #   │      │        H        │
 #   └──────┴─────────────────┘
 #
-# Layouts (based on cols × rows):
-#   1  narrow + short  →  L | R  full height          (mac quake)
-#   2  narrow + tall   →  L | R  top,  H bottom       (mac fullscreen)
-#   3  wide   + short  →  LL | L | R  full height     (ultrawide quake)
-#   4  wide   + tall   →  LL | L | R  top,  H bottom  (ultrawide fullscreen)
+# Layouts:
+#   1  narrow + short  →  L | R  full height
+#   2  narrow + tall   →  L | R  top,  H bottom
+#   3  wide   + short  →  LL | L | R  full height
+#   4  wide   + tall   →  LL | L | R  top,  H bottom
+#
+# State model:
+# - Pane identity is stored in pane user options, not pane titles.
+# - Every managed pane gets:
+#     @dyn_role = L | R | H | LL
+#     @dyn_managed = 1
+#     @dyn_window = <session>:<window>
+#     @dyn_gen = <generation>
+# - The window stores the active generation in @dyn_gen.
+#
+# This lets init/layout run in separate processes and still rediscover panes.
 
 export PATH="/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:$PATH"
 
 SESS="${1:-main}"
 WIN="${2:-dynamic}"
+CMD="${3:-layout}"
 W="$SESS:$WIN"
 
-# Thresholds — tuned to your displays:
-#   mac:        214 cols  (quake) / 58 rows  (fullscreen)
-#   ultrawide:  638 cols  (quake) / 81 rows  (fullscreen)
-WIDE_THRESHOLD=400   # anything above this = ultrawide
-TALL_THRESHOLD=50    # anything above this = fullscreen
-
+WIDE_THRESHOLD=400
+TALL_THRESHOLD=50
 LOG="/tmp/autolayout.log"
 
 log() { echo "$(date '+%H:%M:%S') $*" >> "$LOG"; }
@@ -38,94 +48,158 @@ notify() {
     [[ -n "$client" ]] && tmux display-message -c "$client" "$1" 2>/dev/null || true
 }
 
-[[ "$WIN" == "dynamic" ]] || exit 0
-log "--- fired session=$SESS window=$WIN cmd=${3:-layout}"
+window_exists() {
+    tmux list-windows -t "$SESS" -F '#{window_name}' 2>/dev/null | grep -qx "$WIN"
+}
 
-# ── pane helpers ──────────────────────────────────────────────────────────────
+ensure_window() {
+    window_exists && return 0
+    tmux new-window -t "$SESS" -n "$WIN" -d
+}
+
+window_gen() {
+    tmux show-options -v -w -t "$W" @dyn_gen 2>/dev/null || true
+}
+
+set_window_gen() {
+    tmux set-option -w -t "$W" @dyn_gen "$1" >/dev/null
+}
+
+new_gen() {
+    printf '%s-%s' "$(date +%Y%m%d%H%M%S)" "$$"
+}
+
+set_pane_meta() {
+    local pane="$1" role="$2" gen="$3"
+    tmux set-option -p -t "$pane" @dyn_role "$role" >/dev/null
+    tmux set-option -p -t "$pane" @dyn_managed 1 >/dev/null
+    tmux set-option -p -t "$pane" @dyn_window "$W" >/dev/null
+    tmux set-option -p -t "$pane" @dyn_gen "$gen" >/dev/null
+    tmux select-pane -t "$pane" -T "$role" >/dev/null 2>&1 || true
+}
 
 pane_id() {
-    tmux list-panes -t "$W" -F '#{pane_id} #{pane_title}' 2>/dev/null \
-        | awk -v t="$1" '$2 == t { print $1; exit }'
+    local role="$1"
+    local gen
+    gen=$(window_gen)
+    [[ -n "$gen" ]] || return 0
+
+    tmux list-panes -t "$W" -F '#{pane_id} #{@dyn_role} #{@dyn_gen} #{@dyn_managed}' 2>/dev/null |
+        awk -v role="$role" -v gen="$gen" '$2 == role && $3 == gen && $4 == 1 { print $1; exit }'
 }
 
-pane_cmd() {
-    tmux list-panes -t "$W" -F '#{pane_id} #{pane_current_command}' 2>/dev/null \
-        | awk -v id="$1" '$1 == id { print $2; exit }'
+managed_panes() {
+    local gen
+    gen=$(window_gen)
+    [[ -n "$gen" ]] || return 0
+
+    tmux list-panes -t "$W" -F '#{pane_id} #{@dyn_gen} #{@dyn_managed}' 2>/dev/null |
+        awk -v gen="$gen" '$2 == gen && $3 == 1 { print $1 }'
 }
 
-# ── init ──────────────────────────────────────────────────────────────────────
+clear_managed_panes() {
+    local panes pane keep first
+    mapfile -t panes < <(managed_panes)
 
-init() {
-    log "init start"
+    if ((${#panes[@]} == 0)); then
+        return 0
+    fi
 
-    # Ensure window exists
-    tmux list-windows -t "$SESS" -F '#{window_name}' 2>/dev/null \
-        | grep -qx "$WIN" \
-        || tmux new-window -t "$SESS" -n "$WIN" -d
-    sleep 0.5
+    first="${panes[0]}"
+    keep="$first"
 
-    # Collapse to one pane
-    local count
-    count=$(tmux list-panes -t "$W" 2>/dev/null | wc -l | tr -d ' ')
-    while (( count > 1 )); do
-        local last; last=$(tmux list-panes -t "$W" -F '#{pane_id}' | tail -1)
-        tmux kill-pane -t "$last" 2>/dev/null || true
-        sleep 0.1
-        count=$(tmux list-panes -t "$W" 2>/dev/null | wc -l | tr -d ' ')
+    for pane in "${panes[@]:1}"; do
+        tmux kill-pane -t "$pane" 2>/dev/null || true
     done
 
-    # Capture sole pane → L
-    local iL; iL=$(tmux list-panes -t "$W" -F '#{pane_id}' | head -1)
-    tmux select-pane -t "$iL" -T L
-    log "L = $iL"
-
-    # Split off H (bottom 30%)
-    local iH
-    iH=$(tmux split-window -t "$iL" -v -d -p 30 -P -F '#{pane_id}')
-    tmux select-pane -t "$iH" -T H
-    log "H = $iH"
-    sleep 0.1
-
-    # Split off R (right 50% of L)
-    local iR
-    iR=$(tmux split-window -t "$iL" -h -d -p 50 -P -F '#{pane_id}')
-    tmux select-pane -t "$iR" -T R
-    log "R = $iR"
-    sleep 0.1
-
-    # Split off LL (insert left of L, 25% of full width)
-    local iLL
-    iLL=$(tmux split-window -t "$iL" -h -d -b -p 25 -P -F '#{pane_id}')
-    tmux select-pane -t "$iLL" -T LL
-    log "LL = $iLL"
-    sleep 0.1
-
-    log "init done — L=$iL R=$iR H=$iH LL=$iLL"
-
-    # Wait for tmux to settle before resizing
-    sleep 0.5
-    layout
+    if [[ -n "$keep" ]]; then
+        tmux set-option -p -t "$keep" -u @dyn_role >/dev/null 2>&1 || true
+        tmux set-option -p -t "$keep" -u @dyn_managed >/dev/null 2>&1 || true
+        tmux set-option -p -t "$keep" -u @dyn_window >/dev/null 2>&1 || true
+        tmux set-option -p -t "$keep" -u @dyn_gen >/dev/null 2>&1 || true
+        tmux select-pane -t "$keep" -T '' >/dev/null 2>&1 || true
+    fi
 }
 
-# ── layout ────────────────────────────────────────────────────────────────────
+collapse_to_one_pane() {
+    local count last
+    count=$(tmux list-panes -t "$W" 2>/dev/null | wc -l | tr -d ' ')
+    while (( count > 1 )); do
+        last=$(tmux list-panes -t "$W" -F '#{pane_id}' 2>/dev/null | tail -1)
+        [[ -n "$last" ]] || break
+        tmux kill-pane -t "$last" 2>/dev/null || true
+        count=$(tmux list-panes -t "$W" 2>/dev/null | wc -l | tr -d ' ')
+    done
+}
 
-layout() {
-    tmux list-windows -t "$SESS" -F '#{window_name}' 2>/dev/null \
-        | grep -qx "$WIN" || { log "window not found"; return 0; }
+ensure_base_pane() {
+    local base
+    base=$(tmux list-panes -t "$W" -F '#{pane_id}' 2>/dev/null | head -1)
+    if [[ -z "$base" ]]; then
+        tmux split-window -t "$W" -d -P -F '#{pane_id}' >/dev/null
+        base=$(tmux list-panes -t "$W" -F '#{pane_id}' 2>/dev/null | head -1)
+    fi
+    printf '%s\n' "$base"
+}
 
-    local cols rows
-    cols=$(tmux display-message -p -t "$W" '#{window_width}'  2>/dev/null)
+create_layout() {
+    local gen iL iLL iH iR
+    gen=$(new_gen)
+    set_window_gen "$gen"
+
+    collapse_to_one_pane
+    iL=$(ensure_base_pane)
+    set_pane_meta "$iL" L "$gen"
+    log "L = $iL"
+
+    iLL=$(tmux split-window -t "$iL" -h -d -b -p 10 -P -F '#{pane_id}')
+    set_pane_meta "$iLL" LL "$gen"
+    log "LL = $iLL"
+
+    iH=$(tmux split-window -t "$iL" -v -d -p 30 -P -F '#{pane_id}')
+    set_pane_meta "$iH" H "$gen"
+    log "H = $iH"
+
+    iR=$(tmux split-window -t "$iL" -h -d -p 40 -P -F '#{pane_id}')
+    set_pane_meta "$iR" R "$gen"
+    log "R = $iR"
+
+    log "init done — gen=$gen L=$iL R=$iR H=$iH LL=$iLL"
+}
+
+ensure_layout() {
+    local iL iR iH iLL
+    iL=$(pane_id L)
+    iR=$(pane_id R)
+    iH=$(pane_id H)
+    iLL=$(pane_id LL)
+
+    if [[ -n "$iL" && -n "$iR" && -n "$iH" && -n "$iLL" ]]; then
+        return 0
+    fi
+
+    log "managed panes missing; rebuilding"
+    clear_managed_panes
+    create_layout
+}
+
+apply_layout() {
+    local cols rows iL iR iH iLL
+
+    window_exists || { log "window not found"; return 0; }
+
+    cols=$(tmux display-message -p -t "$W" '#{window_width}' 2>/dev/null)
     rows=$(tmux display-message -p -t "$W" '#{window_height}' 2>/dev/null)
     [[ -z "$cols" || "$cols" -eq 0 ]] && { log "bad dimensions cols=$cols rows=$rows"; return 0; }
 
-    log "layout cols=$cols rows=$rows"
-
-    local iL iR iH iLL
-    iL=$(pane_id L); iR=$(pane_id R); iH=$(pane_id H); iLL=$(pane_id LL)
-    log "panes L=$iL R=$iR H=$iH LL=$iLL"
+    iL=$(pane_id L)
+    iR=$(pane_id R)
+    iH=$(pane_id H)
+    iLL=$(pane_id LL)
+    log "layout cols=$cols rows=$rows panes L=$iL R=$iR H=$iH LL=$iLL"
 
     if [[ -z "$iL" || -z "$iR" || -z "$iH" || -z "$iLL" ]]; then
-        log "panes missing — run dynlayout-reinit"
+        log "panes missing after ensure_layout"
         notify "⚠ panes missing — run: dynlayout-reinit"
         return 1
     fi
@@ -141,44 +215,65 @@ layout() {
     bot_r=$(( rows - top_r - 1 ))
 
     if (( wide && tall )); then
-        # Layout 4 — ultrawide fullscreen
-        tmux resize-pane -t "$iLL" -x "$ll_w"  -y "$rows"
-        tmux resize-pane -t "$iL"  -x "$lr_w"  -y "$top_r"
-        tmux resize-pane -t "$iR"  -x "$lr_w"  -y "$top_r"
+        tmux resize-pane -t "$iLL" -x "$ll_w" -y "$rows"
+        tmux resize-pane -t "$iL"  -x "$lr_w" -y "$top_r"
+        tmux resize-pane -t "$iR"  -x "$lr_w" -y "$top_r"
         tmux resize-pane -t "$iH"  -y "$bot_r"
         notify "◼◼◼◼ ultrawide fullscreen (${cols}x${rows})"
-
     elif (( wide )); then
-        # Layout 3 — ultrawide quake
-        tmux resize-pane -t "$iLL" -x "$ll_w"  -y "$rows"
-        tmux resize-pane -t "$iL"  -x "$lr_w"  -y "$rows"
-        tmux resize-pane -t "$iR"  -x "$lr_w"  -y "$rows"
+        tmux resize-pane -t "$iLL" -x "$ll_w" -y "$rows"
+        tmux resize-pane -t "$iL"  -x "$lr_w" -y "$rows"
+        tmux resize-pane -t "$iR"  -x "$lr_w" -y "$rows"
         tmux resize-pane -t "$iH"  -y 1
         notify "◼◼◼ ultrawide quake (${cols}x${rows})"
-
     elif (( tall )); then
-        # Layout 2 — mac fullscreen
-        tmux resize-pane -t "$iLL" -x
-        tmux resize-pane -t "$iL"  -x "$lr_w"  -y "$top_r"
-        tmux resize-pane -t "$iR"  -x "$lr_w"  -y "$top_r"
+        tmux resize-pane -t "$iLL" -x 1
+        tmux resize-pane -t "$iL"  -x "$lr_w" -y "$top_r"
+        tmux resize-pane -t "$iR"  -x "$lr_w" -y "$top_r"
         tmux resize-pane -t "$iH"  -y "$bot_r"
         notify "◼◼ mac fullscreen (${cols}x${rows})"
-
     else
-        # Layout 1 — mac quake
-        tmux resize-pane -t "$iLL" -x 1;
-        tmux resize-pane -t "$iH"  -y 1;
-        tmux resize-pane -t "$iL"  -x "$lr_w"  -y "$rows"
-        tmux resize-pane -t "$iR"  -x "$lr_w"  -y "$rows"
+        tmux resize-pane -t "$iLL" -x 1
+        tmux resize-pane -t "$iH"  -y 1
+        tmux resize-pane -t "$iL"  -x "$lr_w" -y "$rows"
+        tmux resize-pane -t "$iR"  -x "$lr_w" -y "$rows"
         notify "◼ mac quake (${cols}x${rows})"
     fi
 
     log "layout done"
 }
 
-# ── entry ─────────────────────────────────────────────────────────────────────
+init_cmd() {
+    log "init start session=$SESS window=$WIN"
+    ensure_window
+    create_layout
+    apply_layout
+}
 
-case "${3:-layout}" in
-    init) init   ;;
-    *)    layout ;;
-esac
+layout_cmd() {
+    log "layout start session=$SESS window=$WIN"
+    ensure_window
+    ensure_layout
+    apply_layout
+}
+
+reinit_cmd() {
+    log "reinit start session=$SESS window=$WIN"
+    ensure_window
+    clear_managed_panes
+    create_layout
+    apply_layout
+}
+
+main() {
+    [[ "$WIN" == "dynamic" ]] || exit 0
+    log "--- fired session=$SESS window=$WIN cmd=$CMD"
+
+    case "$CMD" in
+        init)   init_cmd ;;
+        reinit) reinit_cmd ;;
+        *)      layout_cmd ;;
+    esac
+}
+
+main "$@"

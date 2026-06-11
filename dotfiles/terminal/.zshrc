@@ -158,9 +158,3 @@ bindkey '^U' backward-kill-line
 bindkey '^N' end-of-line
 
 
-TMOUT=20   # in seconds
-TRAPALRM() {
-  # run cmatrix in "screensaver" mode: exits on first keypress
-  cm
-  zle reset-prompt 2>/dev/null
-}
