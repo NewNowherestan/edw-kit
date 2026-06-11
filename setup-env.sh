@@ -34,8 +34,16 @@ if pgrep -x "ghostty" >/dev/null 2>&1; then
 fi
 
 # 4. omz reload / zsh reload
-# Since we are in a subshell, we can't source into the parent shell.
-# We will print a message to the user.
+
+if pgrep -x "omz" >/dev/null 2>&1; then
+  log "Reloading oh my zsh configuration..."
+  omz reload
+fi
+
+# 5 tmux autolayout
+
+chmod +x dotfiles/terminal/.config/tmux/{dynopen.sh,autolayout.sh}
+
 log "Environment setup complete."
 log "To reload your shell, run: exec zsh"
 log "Or use the OMZ alias if available: omz reload"

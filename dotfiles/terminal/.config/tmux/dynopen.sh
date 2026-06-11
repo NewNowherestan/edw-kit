@@ -1,12 +1,18 @@
-#!/bin/sh
+#!/usr/bin/env bash
 # ~/.config/tmux/dynopen.sh
-TMUX_BIN=$(command -v tmux || echo /opt/homebrew/bin/tmux)
-SESS=main
-WIN=dynamic
+# Select the dynamic window, creating and initialising it if needed.
 
-$TMUX_BIN select-window -t "${SESS}:${WIN}" 2>/dev/null && exit 0
+export PATH="/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:$PATH"
 
-$TMUX_BIN new-window -t "$SESS" -n "$WIN" -d
+SESS=$(tmux display-message -p '#S' 2>/dev/null)
+SESS="${SESS:-main}"
+WIN="dynamic"
+
+# Already exists — just focus it
+tmux select-window -t "${SESS}:${WIN}" 2>/dev/null && exit 0
+
+# Create and init
+tmux new-window -t "$SESS" -n "$WIN" -d
 sleep 0.3
-/bin/bash "$HOME/.config/tmux/autolayout.sh" init
-$TMUX_BIN select-window -t "${SESS}:${WIN}"
+bash "$HOME/.config/tmux/autolayout.sh" "$SESS" "$WIN" init
+tmux select-window -t "${SESS}:${WIN}"
