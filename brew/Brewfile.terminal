@@ -6,7 +6,6 @@ brew "tmux"                   # Terminal multiplexer — persistent sessions, pa
 brew "starship"               # Cross-shell prompt — fast, git-aware
 brew "stow"                   # Symlink farm manager — how edw-kit installs itself
 brew "thefuck"
-brew "cmatrix"
 
 # ── Editor ───────────────────────────────────────────────────────────────────
 brew "vim"                    # Classic editor — always available as fallback
@@ -35,11 +34,6 @@ brew "duf"                    # df replacement — cleaner disk info
 # ── Network ──────────────────────────────────────────────────────────────────
 brew "curl"
 brew "wget"
-brew "httpie"                 # Human-friendly HTTP client — quick API testing
-brew "gping"
-brew "trippy"
-brew "bandwhich"
-brew "gruyere"
 
 # ── Data & text ──────────────────────────────────────────────────────────────
 brew "jq"                     # JSON processor — essential for scripts and APIs
@@ -56,7 +50,6 @@ brew "entr"                   # Run commands on file change — lightweight watc
 brew "age"                  # Simple modern file encryption (uncomment if needed)
 # brew "gnupg"                # GPG — signing, encryption (uncomment if needed)
 brew "ffmpeg"                 # Video/audio processing — transcoding, screenshots
-brew "yt-dlp"                 # Download video/audio from YouTube and 500+ sites
 
 brew "glow"                   # Markdown reader in terminal
 

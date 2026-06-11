@@ -150,6 +150,7 @@ install_shell() {
 install_terminal() {
   install_shell
   brew_bundle "brew/Brewfile.terminal"
+  brew_bundle "brew/Brewfile.terminal_extras"
   stow_profile "terminal"
 }
 

@@ -1,0 +1,22 @@
+# brew bundle --file=brew/Brewfile.terminal_extras
+
+brew "cmatrix"
+
+brew "httpie"                 # Human-friendly HTTP client — quick API testing
+
+brew "yt-dlp"                 # Download video/audio from YouTube and 500+ sites
+
+# from https://terminal-apps.dev/
+brew "trippy"
+brew "yazi"
+brew "backlog-md"
+brew "gittype"
+brew "gitlogue"
+
+# from https://github.com/rothgar/awesome-tuis
+brew "astroterm"
+
+# from https://terminaltrove.com/categories/tui/
+brew "gping"
+brew "bandwhich"
+brew "gruyere"
