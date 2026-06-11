@@ -7,7 +7,7 @@
 #   ┌──────┬────────┬────────┐
 #   │      │   L    │   R    │
 #   │  LL  ├────────┴────────┤
-#   │      │       H        │
+#   │      │        H        │
 #   └──────┴─────────────────┘
 #
 # Layouts (based on cols × rows):
@@ -51,19 +51,6 @@ pane_id() {
 pane_cmd() {
     tmux list-panes -t "$W" -F '#{pane_id} #{pane_current_command}' 2>/dev/null \
         | awk -v id="$1" '$1 == id { print $2; exit }'
-}
-
-kill_cmatrix() {
-    [[ "$(pane_cmd "$1")" == "cmatrix" ]] || return 0
-    tmux send-keys -t "$1" q ""
-    sleep 0.1
-    [[ "$(pane_cmd "$1")" == "cmatrix" ]] && tmux send-keys -t "$1" "" ""
-}
-
-maybe_cmatrix() {
-    local cmd; cmd=$(pane_cmd "$1")
-    [[ "$cmd" == "zsh" || "$cmd" == "bash" || "$cmd" == "sh" ]] \
-        && tmux send-keys -t "$1" "cmatrix -s -C cyan" Enter
 }
 
 # ── init ──────────────────────────────────────────────────────────────────────
@@ -155,7 +142,6 @@ layout() {
 
     if (( wide && tall )); then
         # Layout 4 — ultrawide fullscreen
-        kill_cmatrix "$iLL"; kill_cmatrix "$iH"
         tmux resize-pane -t "$iLL" -x "$ll_w"  -y "$rows"
         tmux resize-pane -t "$iL"  -x "$lr_w"  -y "$top_r"
         tmux resize-pane -t "$iR"  -x "$lr_w"  -y "$top_r"
@@ -164,17 +150,15 @@ layout() {
 
     elif (( wide )); then
         # Layout 3 — ultrawide quake
-        kill_cmatrix "$iLL"; kill_cmatrix "$iH"
         tmux resize-pane -t "$iLL" -x "$ll_w"  -y "$rows"
         tmux resize-pane -t "$iL"  -x "$lr_w"  -y "$rows"
         tmux resize-pane -t "$iR"  -x "$lr_w"  -y "$rows"
-        tmux resize-pane -t "$iH"  -y 1; maybe_cmatrix "$iH"
+        tmux resize-pane -t "$iH"  -y 1
         notify "◼◼◼ ultrawide quake (${cols}x${rows})"
 
     elif (( tall )); then
         # Layout 2 — mac fullscreen
-        kill_cmatrix "$iH"
-        tmux resize-pane -t "$iLL" -x 1;        maybe_cmatrix "$iLL"
+        tmux resize-pane -t "$iLL" -x
         tmux resize-pane -t "$iL"  -x "$lr_w"  -y "$top_r"
         tmux resize-pane -t "$iR"  -x "$lr_w"  -y "$top_r"
         tmux resize-pane -t "$iH"  -y "$bot_r"
@@ -182,8 +166,8 @@ layout() {
 
     else
         # Layout 1 — mac quake
-        tmux resize-pane -t "$iLL" -x 1;        maybe_cmatrix "$iLL"
-        tmux resize-pane -t "$iH"  -y 1;        maybe_cmatrix "$iH"
+        tmux resize-pane -t "$iLL" -x 1;
+        tmux resize-pane -t "$iH"  -y 1;
         tmux resize-pane -t "$iL"  -x "$lr_w"  -y "$rows"
         tmux resize-pane -t "$iR"  -x "$lr_w"  -y "$rows"
         notify "◼ mac quake (${cols}x${rows})"

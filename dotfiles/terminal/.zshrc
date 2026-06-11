@@ -139,6 +139,7 @@ ZSH_TMUX_DEFAULT_SESSION_NAME="main"
 
 alias lgit='lazygit'
 alias tf='thefuck !!'
+alias cm='cmatrix -s -C cyan'
 
 alias adbscreen_save='adb exec-out screencap -p > ~/Downloads/screen_$(date +"%Y-%m-%d_%H-%M-%S").png'
 alias adbscreen='adb exec-out screencap -p > /tmp/adb_screen.png && \
@@ -155,3 +156,11 @@ export TASKWARRIOR_TUI_TASKWARRIOR_CLI="/opt/homebrew/opt/task/bin/task"
 
 bindkey '^U' backward-kill-line
 bindkey '^N' end-of-line
+
+
+TMOUT=20   # in seconds
+TRAPALRM() {
+  # run cmatrix in "screensaver" mode: exits on first keypress
+  cm
+  zle reset-prompt 2>/dev/null
+}
