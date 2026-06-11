@@ -10,7 +10,7 @@ brew "yt-dlp"                 # Download video/audio from YouTube and 500+ sites
 brew "trippy"
 brew "yazi"
 brew "backlog-md"
-brew "gittype"
+# brew "gittype"
 brew "gitlogue"
 
 # from https://github.com/rothgar/awesome-tuis
