@@ -137,6 +137,8 @@ ZSH_TMUX_DEFAULT_SESSION_NAME="main"
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
+alias lgit='lazygit'
+
 alias adbscreen_save='adb exec-out screencap -p > ~/Downloads/screen_$(date +"%Y-%m-%d_%H-%M-%S").png'
 alias adbscreen='adb exec-out screencap -p > /tmp/adb_screen.png && \
   osascript -e "set the clipboard to (read (POSIX file \"/tmp/adb_screen.png\") as «class PNGf»)"'
