@@ -101,6 +101,7 @@ source $ZSH/oh-my-zsh.sh
 eval "$(starship init zsh)"
 eval "$(zoxide init zsh)"
 eval "$(direnv hook zsh)"
+eval "$(thefuck --alias)"
 
 # User configuration
 
@@ -137,8 +138,9 @@ ZSH_TMUX_DEFAULT_SESSION_NAME="main"
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
+alias cc='clipcopy'
 alias lgit='lazygit'
-alias tf='thefuck !!'
+alias th='fuck'
 alias cm='cmatrix -s -C cyan'
 
 alias adbscreen_save='adb exec-out screencap -p > ~/Downloads/screen_$(date +"%Y-%m-%d_%H-%M-%S").png'
