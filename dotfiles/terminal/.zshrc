@@ -139,6 +139,8 @@ ZSH_TMUX_DEFAULT_SESSION_NAME="main"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
 alias cc='clipcopy'
+alias cp='clippaste'
+alias cnms='cp | nms -a -f cyan'
 alias lgit='lazygit'
 alias th='fuck'
 alias cm='cmatrix -s -C cyan'
