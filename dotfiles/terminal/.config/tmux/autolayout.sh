@@ -37,7 +37,7 @@ CMD="${3:-layout}"
 W="$SESS:$WIN"
 
 WIDE_THRESHOLD=400
-TALL_THRESHOLD=50
+TALL_THRESHOLD=54
 LOG="/tmp/autolayout.log"
 
 log() { echo "$(date '+%H:%M:%S') $*" >> "$LOG"; }
