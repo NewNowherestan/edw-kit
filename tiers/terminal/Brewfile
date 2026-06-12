@@ -1,5 +1,5 @@
-# Brewfile.terminal — CLI baseline, works on macOS and Linux.
-# Apply: ./install.sh terminal   (or: brew bundle --file=brew/Brewfile.terminal)
+# tiers/terminal/Brewfile — CLI baseline, works on macOS and Linux.
+# Apply: ./install.sh terminal   (or: brew bundle --file=tiers/terminal/Brewfile)
 
 # ── Shell ────────────────────────────────────────────────────────────────────
 brew "zsh"

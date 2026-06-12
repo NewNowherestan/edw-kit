@@ -1,12 +1,16 @@
 #!/usr/bin/env bash
-# install.sh — apply a profile: brew packages + stowed dotfiles.
+# install.sh — apply a profile: an ordered list of tiers.
 #
-# Profiles are cumulative tiers, not per-app choices:
+# Profiles are cumulative, managed by tier, not by app:
 #   shell ⊂ terminal ⊂ workstation ⊂ full
 #
-# Each tier is defined below as a profile_* function composed from the
-# building blocks in lib/steps.sh. To change what a tier does, edit its
-# function; to change *how* steps run, edit lib/.
+# Each tier lives self-contained in tiers/<name>/ (Brewfile, dotfiles/,
+# optional before.sh / after.sh hooks, optional macos-only marker); the
+# engine that applies one is lib/steps.sh. A hosts/<hostname>/ overlay,
+# same shape, is applied last when present.
+#
+# The highest profile ever installed is recorded in
+# ~/.local/state/edw-kit/profile so `make sync` can re-align the machine.
 set -euo pipefail
 
 source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/lib/common.sh"
@@ -14,35 +18,36 @@ source "${EDW_ROOT}/lib/steps.sh"
 
 # ── Profiles ─────────────────────────────────────────────────────────────────
 
-profile_shell() {
-  stow_package "shell"            # oh-my-zsh core (pinned submodule)
+profile_tiers() {
+  case "$1" in
+    shell)       echo "shell" ;;
+    terminal)    echo "shell terminal" ;;
+    workstation) echo "shell terminal workstation" ;;
+    full)        echo "shell terminal workstation full" ;;
+    *) return 1 ;;
+  esac
 }
 
-profile_terminal() {
-  profile_shell
-  brew_bundle "terminal"
-  brew_bundle "terminal_extras"
-  stow_package "terminal"         # zsh, tmux, vim, starship, omz plugins
+profile_rank() {
+  case "$1" in
+    shell) echo 0 ;;
+    terminal) echo 1 ;;
+    workstation) echo 2 ;;
+    full) echo 3 ;;
+    *) echo -1 ;;
+  esac
 }
 
-profile_workstation() {
-  profile_terminal
-  if ! is_macos; then
-    log "SKIP: workstation layer is macOS-only"
-    return 0
+# Remember the highest profile this machine has seen, for `make sync`.
+record_profile() {
+  local new="$1"
+  local current=""
+  [[ -f "${EDW_PROFILE_FILE}" ]] && current="$(cat "${EDW_PROFILE_FILE}")"
+  if [[ -z "${current}" ]] || \
+     [[ "$(profile_rank "${new}")" -gt "$(profile_rank "${current}")" ]]; then
+    [[ "${DRY_RUN}" -eq 1 ]] || echo "${new}" >"${EDW_PROFILE_FILE}"
+    log "recorded profile: ${new}"
   fi
-  brew_bundle "workstation"
-  stow_package "workstation"      # ghostty, karabiner, aerospace
-}
-
-profile_full() {
-  profile_workstation
-  if ! is_macos; then
-    log "SKIP: full layer is macOS-only"
-    return 0
-  fi
-  brew_bundle "full" --no-mas
-  mas_install "1Focus" "1258530160"
 }
 
 # ── CLI ──────────────────────────────────────────────────────────────────────
@@ -100,8 +105,12 @@ main() {
 
   log "Starting (profile=${PROFILE}). Log: ${EDW_LOG_FILE}"
 
-  "profile_${PROFILE}"
-  stow_host_overlay
+  local tier
+  for tier in $(profile_tiers "${PROFILE}"); do
+    apply_tier "tiers/${tier}"
+  done
+  apply_host_tier
+  record_profile "${PROFILE}"
   run_step_optional "reload running environment" "${EDW_ROOT}/scripts/reload-env.sh"
 
   log "Done (profile=${PROFILE}). Log: ${EDW_LOG_FILE}"

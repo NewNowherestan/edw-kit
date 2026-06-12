@@ -2,7 +2,7 @@
 .idea
 
 # App-generated noise
-dotfiles/workstation/.config/karabiner/automatic_backups/
+tiers/workstation/dotfiles/.config/karabiner/automatic_backups/
 
 # Taskwarrior: the database itself (usr/taskchampion.sqlite3) is versioned
 # on purpose, but sqlite's transient journal files must never be.

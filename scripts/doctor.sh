@@ -46,7 +46,8 @@ for cmd in zsh tmux stow git nvim fzf rg fd bat eza zoxide jq starship direnv; d
 done
 
 section "Stowed dotfiles"
-for link in .zshrc .tmux.conf .vimrc .config/starship.toml .config/tmux/dynamic_layout.conf; do
+for link in .zshrc .tmux.conf .vimrc .oh-my-zsh .config/omz-custom \
+            .config/starship.toml .config/tmux/dynamic_layout.conf; do
   check_link "${link}"
 done
 if [[ "$(uname -s)" == "Darwin" ]]; then
@@ -66,13 +67,20 @@ done < <(git -C "${ROOT_DIR}" submodule status --recursive | awk '{print substr(
 
 section "Homebrew bundle (terminal tier)"
 if command -v brew >/dev/null 2>&1; then
-  if brew bundle check --no-upgrade --file="${ROOT_DIR}/brew/Brewfile.terminal" >/dev/null 2>&1; then
-    ok "all Brewfile.terminal dependencies satisfied"
+  if brew bundle check --no-upgrade --file="${ROOT_DIR}/tiers/terminal/Brewfile" >/dev/null 2>&1; then
+    ok "all terminal Brewfile dependencies satisfied"
   else
-    info "some Brewfile.terminal entries missing (run: ./install.sh terminal)"
+    info "some terminal Brewfile entries missing (run: make sync)"
   fi
 else
   bad "brew not found"
+fi
+
+section "Recorded profile"
+if [[ -f "${HOME}/.local/state/edw-kit/profile" ]]; then
+  ok "profile: $(cat "${HOME}/.local/state/edw-kit/profile") (make sync re-applies it)"
+else
+  info "no profile recorded yet — run ./install.sh <profile> once"
 fi
 
 printf '\n'

@@ -1,3 +1,4 @@
---dir=dotfiles
 --target=~
 --verbose=1
+# Manual usage from repo root: stow -d tiers/<tier> dotfiles
+# (install.sh / make sync pass --dir explicitly and don't read this file)

@@ -1,4 +1,4 @@
-# Brewfile.workstation — macOS desktop layer: window management, terminal
+# tiers/workstation/Brewfile — macOS desktop layer: window management, terminal
 # emulator, input, fonts. Applied on top of the terminal tier.
 
 # ── Window & input ───────────────────────────────────────────────────────────

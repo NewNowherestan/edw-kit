@@ -1,4 +1,4 @@
-# Brewfile.terminal_extras — fun and situational CLI tools.
+# tiers/terminal/Brewfile.extras — fun and situational CLI tools.
 # Installed with the terminal profile; safe to trim aggressively.
 # Discovery sources: https://terminal-apps.dev/  https://terminaltrove.com/
 #                    https://github.com/rothgar/awesome-tuis

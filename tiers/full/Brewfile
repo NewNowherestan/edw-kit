@@ -1,6 +1,6 @@
-# Brewfile.full — everything else: communication, media, maintenance.
+# tiers/full/Brewfile — everything else: communication, media, maintenance.
 # Applied on top of the workstation tier. App Store entries are installed
-# by install.sh via mas_install so a missing account doesn't abort the run.
+# by after.sh via mas_install so a missing account doesn't abort the run.
 
 # ── Communication ────────────────────────────────────────────────────────────
 cask "telegram"

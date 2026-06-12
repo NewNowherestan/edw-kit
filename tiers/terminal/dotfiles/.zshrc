@@ -1,7 +1,8 @@
-# ~/.zshrc — managed by edw-kit (dotfiles/terminal). Edit there, not in ~.
+# ~/.zshrc — managed by edw-kit (tiers/terminal/dotfiles). Edit there, not in ~.
 
 # ── Oh My Zsh ────────────────────────────────────────────────────────────────
-export ZSH="$HOME/.oh-my-zsh"
+export ZSH="$HOME/.oh-my-zsh"                  # core, owned by the shell tier
+export ZSH_CUSTOM="$HOME/.config/omz-custom"   # plugins, owned by the terminal tier
 ZSH_THEME="robbyrussell"      # cosmetic only — starship takes over the prompt below
 
 # tmux plugin: auto-start/attach a "main" session on shell launch
@@ -10,7 +11,7 @@ ZSH_TMUX_AUTOSTART_ONCE=true
 ZSH_TMUX_AUTOCONNECT=true
 ZSH_TMUX_DEFAULT_SESSION_NAME="main"
 
-# Custom plugins live in dotfiles/terminal/.oh-my-zsh/custom/plugins (submodules)
+# Custom plugins live in tiers/terminal/dotfiles/.config/omz-custom/plugins (submodules)
 plugins=(
     git
     history-substring-search

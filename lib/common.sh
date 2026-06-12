@@ -9,6 +9,7 @@ EDW_COMMON_LOADED=1
 EDW_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 EDW_STATE_DIR="${HOME}/.local/state/edw-kit"
 EDW_LOG_FILE="${EDW_STATE_DIR}/install.log"
+EDW_PROFILE_FILE="${EDW_STATE_DIR}/profile"
 EDW_OS="$(uname -s)"
 
 # Flags shared across entry points; parse_common_args sets these.
