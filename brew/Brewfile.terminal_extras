@@ -6,6 +6,8 @@ brew "httpie"                 # Human-friendly HTTP client — quick API testing
 
 brew "yt-dlp"                 # Download video/audio from YouTube and 500+ sites
 
+brew "no-more-secrets"
+
 # from https://terminal-apps.dev/
 brew "trippy"
 brew "yazi"
