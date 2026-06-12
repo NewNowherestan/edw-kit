@@ -1,2 +1,13 @@
-dotfiles/workstation/.config/karabiner/automatic_backups/
+# IDE
 .idea
+
+# App-generated noise
+dotfiles/workstation/.config/karabiner/automatic_backups/
+
+# Taskwarrior: the database itself (usr/taskchampion.sqlite3) is versioned
+# on purpose, but sqlite's transient journal files must never be.
+usr/*.sqlite3-shm
+usr/*.sqlite3-wal
+
+# Brew lock files are generated; commit them only if you want pinning
+# brew/*.lock.json

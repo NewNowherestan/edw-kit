@@ -1,11 +1,12 @@
-# brew bundle --file=brew/Brewfile.terminal
+# Brewfile.terminal — CLI baseline, works on macOS and Linux.
+# Apply: ./install.sh terminal   (or: brew bundle --file=brew/Brewfile.terminal)
 
 # ── Shell ────────────────────────────────────────────────────────────────────
 brew "zsh"
 brew "tmux"                   # Terminal multiplexer — persistent sessions, panes
 brew "starship"               # Cross-shell prompt — fast, git-aware
 brew "stow"                   # Symlink farm manager — how edw-kit installs itself
-brew "thefuck"
+brew "thefuck"                # Corrects previous command — bound to `th` alias
 
 # ── Editor ───────────────────────────────────────────────────────────────────
 brew "vim"                    # Classic editor — always available as fallback
@@ -15,6 +16,8 @@ brew "neovim"                 # Modern vim — primary editor, lua config
 brew "git"
 brew "git-delta"              # Better diffs — syntax highlighted, side-by-side
 brew "lazygit"                # TUI git client — standalone or inside nvim
+# brew "gh"                   # GitHub CLI — PRs, issues, CI from the terminal
+# brew "git-absorb"           # Auto-folds fixups into the right commits
 
 # ── File & search ────────────────────────────────────────────────────────────
 brew "fzf"                    # Fuzzy finder — history, files, processes
@@ -30,6 +33,7 @@ brew "htop"                   # Interactive process viewer
 brew "btop"                   # Resource monitor — prettier than htop
 brew "dust"                   # du replacement — visual disk usage
 brew "duf"                    # df replacement — cleaner disk info
+# brew "procs"                # ps replacement — readable columns, tree view
 
 # ── Network ──────────────────────────────────────────────────────────────────
 brew "curl"
@@ -40,18 +44,32 @@ brew "jq"                     # JSON processor — essential for scripts and API
 brew "yq"                     # YAML/JSON/XML processor — jq for structured files
 brew "gawk"                   # GNU awk — text processing
 brew "gnu-sed"                # GNU sed — macOS sed is BSD, this is the real one
+# brew "fx"                   # Interactive JSON viewer — explore API payloads
+# brew "sd"                   # sed for humans — `sd before after` and done
 
 # ── Productivity ─────────────────────────────────────────────────────────────
 brew "tldr"                   # Simplified man pages — practical examples
 brew "cheat"                  # Community cheatsheets for common commands
 brew "direnv"                 # Auto-load .envrc on cd — per-project env vars
 brew "entr"                   # Run commands on file change — lightweight watch
-# brew "just"                   # Command runner / Makefile alternative
-brew "age"                  # Simple modern file encryption (uncomment if needed)
-# brew "gnupg"                # GPG — signing, encryption (uncomment if needed)
+brew "glow"                   # Markdown reader in terminal
+brew "age"                    # Simple modern file encryption
+# brew "just"                 # Command runner — Makefile alternative
+# brew "gnupg"                # GPG — signing, encryption
+# brew "atuin"                # Shell history database — synced, searchable, stats
+# brew "hyperfine"            # CLI benchmarking — compare command runtimes
+# brew "watchexec"            # entr alternative — better for multi-file projects
+
+# ── Media ────────────────────────────────────────────────────────────────────
 brew "ffmpeg"                 # Video/audio processing — transcoding, screenshots
 
-brew "glow"                   # Markdown reader in terminal
+# ── Tasks ────────────────────────────────────────────────────────────────────
+brew "taskwarrior-tui"        # TUI for taskwarrior — data lives in usr/ via direnv
 
-# ── tools -───────────────────────────────────────────────────────────────────
-brew "taskwarrior-tui"
+# ── Dev toolchains (uncomment what you need) ─────────────────────────────────
+# brew "mise"                 # Polyglot version manager — replaces nvm/jenv/sdkman
+# brew "openjdk@21"           # Or manage JDKs via mise / sdkman instead
+# brew "maven"
+# brew "gradle"
+# brew "kotlin"
+# brew "lazydocker"           # lazygit-style TUI for docker

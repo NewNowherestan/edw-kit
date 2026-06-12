@@ -1,24 +1,31 @@
-# brew bundle --file=brew/Brewfile.terminal_extras
+# Brewfile.terminal_extras — fun and situational CLI tools.
+# Installed with the terminal profile; safe to trim aggressively.
+# Discovery sources: https://terminal-apps.dev/  https://terminaltrove.com/
+#                    https://github.com/rothgar/awesome-tuis
 
-brew "cmatrix"
+# ── Network diagnostics ──────────────────────────────────────────────────────
+brew "trippy"                 # mtr-style traceroute TUI
+brew "gping"                  # ping with a live graph
+brew "bandwhich"              # Per-process bandwidth usage
 
+# ── HTTP & downloads ─────────────────────────────────────────────────────────
 brew "httpie"                 # Human-friendly HTTP client — quick API testing
-
 brew "yt-dlp"                 # Download video/audio from YouTube and 500+ sites
 
-brew "no-more-secrets"
+# ── Files & project ──────────────────────────────────────────────────────────
+brew "yazi"                   # Terminal file manager — fast, vim keys, previews
+brew "backlog-md"             # Markdown-native task board (used by this repo)
 
-# from https://terminal-apps.dev/
-brew "trippy"
-brew "yazi"
-brew "backlog-md"
-# brew "gittype"
-brew "gitlogue"
+# ── Eye candy ────────────────────────────────────────────────────────────────
+brew "cmatrix"                # Matrix rain — bound to `cm` alias
+brew "no-more-secrets"        # Sneakers-style decrypt effect — used as screensaver
+brew "gitlogue"               # Replay repo history as a cinematic
+brew "astroterm"              # Star map in the terminal
+brew "gruyere"                # Swiss-cheese loading spinners
+# brew "gittype"              # Typing game over your own git history
 
-# from https://github.com/rothgar/awesome-tuis
-brew "astroterm"
-
-# from https://terminaltrove.com/categories/tui/
-brew "gping"
-brew "bandwhich"
-brew "gruyere"
+# ── More ideas (uncomment to try) ────────────────────────────────────────────
+# brew "asciinema"            # Record and share terminal sessions
+# brew "fastfetch"            # System info splash — neofetch successor
+# brew "slides"               # Markdown presentations in the terminal
+# brew "ncspot"               # Spotify TUI client

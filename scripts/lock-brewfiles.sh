@@ -25,9 +25,13 @@ lock_file() {
 main() {
   require_cmd brew
 
-  lock_file "${BREW_DIR}/Brewfile.terminal"
-  lock_file "${BREW_DIR}/Brewfile.workstation"
-  lock_file "${BREW_DIR}/Brewfile.full"
+  local file
+  for file in "${BREW_DIR}"/Brewfile.*; do
+    case "${file}" in
+      *.lock.json) continue ;;
+      *) lock_file "${file}" ;;
+    esac
+  done
 
   echo "Done."
 }

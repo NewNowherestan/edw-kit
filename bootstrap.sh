@@ -1,19 +1,15 @@
 #!/usr/bin/env bash
+# bootstrap.sh — fresh-machine entry point.
+# Prepares platform prerequisites (Xcode CLT, Rosetta, Homebrew),
+# then hands off to install.sh with a sensible default profile:
+#   macOS → workstation, Linux → terminal.
 set -euo pipefail
 
-ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-OS="$(uname -s)"
+source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/lib/common.sh"
+
 DEFAULT_PROFILE="terminal"
 
-say() {
-  printf '%s\n' "$*"
-}
-
-die() {
-  printf 'ERROR: %s\n' "$*" >&2
-  exit 1
-}
-
+# Did the caller already pick a profile (positionally or via --profile)?
 has_explicit_profile() {
   local next_is_profile=0
   for arg in "$@"; do
@@ -22,7 +18,7 @@ has_explicit_profile() {
     fi
     case "${arg}" in
       -p|--profile) next_is_profile=1 ;;
-      terminal|workstation|full|1|2|3) return 0 ;;
+      shell|terminal|workstation|full|0|1|2|3) return 0 ;;
     esac
   done
   return 1
@@ -32,41 +28,42 @@ ensure_macos_requirements() {
   command -v xcode-select >/dev/null 2>&1 || die "xcode-select not found"
 
   if ! xcode-select -p >/dev/null 2>&1; then
-    say "→ installing Xcode Command Line Tools"
+    log "→ installing Xcode Command Line Tools"
     xcode-select --install || true
     die "finish Xcode CLI tools installation, then re-run bootstrap.sh"
   fi
 
   if [[ "$(uname -m)" == "arm64" ]] && ! /usr/bin/arch -x86_64 /usr/bin/true >/dev/null 2>&1; then
-    say "→ installing Rosetta 2"
+    log "→ installing Rosetta 2"
     /usr/sbin/softwareupdate --install-rosetta --agree-to-license
   fi
 }
 
 ensure_brew() {
   if command -v brew >/dev/null 2>&1; then
-    return
+    return 0
   fi
 
   command -v git >/dev/null 2>&1 || die "git is required to install Homebrew from the pinned submodule"
 
-  say "→ installing Homebrew via pinned submodule"
-  git -C "${ROOT_DIR}" submodule update --init submodules/homebrew-install
-  NONINTERACTIVE=1 bash "${ROOT_DIR}/submodules/homebrew-install/install.sh"
+  log "→ installing Homebrew via pinned submodule"
+  git -C "${EDW_ROOT}" submodule update --init submodules/homebrew-install
+  NONINTERACTIVE=1 bash "${EDW_ROOT}/submodules/homebrew-install/install.sh"
 
-  if [[ -x /opt/homebrew/bin/brew ]]; then
-    eval "$(/opt/homebrew/bin/brew shellenv)"
-  elif [[ -x /usr/local/bin/brew ]]; then
-    eval "$(/usr/local/bin/brew shellenv)"
-  elif [[ -x /home/linuxbrew/.linuxbrew/bin/brew ]]; then
-    eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
-  fi
+  # brew was just installed but isn't on PATH yet in this shell.
+  local prefix
+  for prefix in /opt/homebrew /usr/local /home/linuxbrew/.linuxbrew; do
+    if [[ -x "${prefix}/bin/brew" ]]; then
+      eval "$("${prefix}/bin/brew" shellenv)"
+      break
+    fi
+  done
 
-  command -v brew >/dev/null 2>&1 || die "Homebrew installation completed but brew is still not in PATH"
+  command -v brew >/dev/null 2>&1 || die "Homebrew installed but brew is still not in PATH"
 }
 
 main() {
-  case "${OS}" in
+  case "${EDW_OS}" in
     Darwin)
       DEFAULT_PROFILE="workstation"
       ensure_macos_requirements
@@ -75,18 +72,16 @@ main() {
       DEFAULT_PROFILE="terminal"
       ;;
     *)
-      die "unsupported platform: ${OS}"
+      die "unsupported platform: ${EDW_OS}"
       ;;
   esac
-
 
   ensure_brew
 
   if has_explicit_profile "$@"; then
-    exec "${ROOT_DIR}/install.sh" "$@"
+    exec "${EDW_ROOT}/install.sh" "$@"
   fi
-
-  exec "${ROOT_DIR}/install.sh" --profile "${DEFAULT_PROFILE}" "$@"
+  exec "${EDW_ROOT}/install.sh" --profile "${DEFAULT_PROFILE}" "$@"
 }
 
 main "$@"

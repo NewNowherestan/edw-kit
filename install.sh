@@ -1,26 +1,53 @@
 #!/usr/bin/env bash
+# install.sh — apply a profile: brew packages + stowed dotfiles.
+#
+# Profiles are cumulative tiers, not per-app choices:
+#   shell ⊂ terminal ⊂ workstation ⊂ full
+#
+# Each tier is defined below as a profile_* function composed from the
+# building blocks in lib/steps.sh. To change what a tier does, edit its
+# function; to change *how* steps run, edit lib/.
 set -euo pipefail
 
-ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-STATE_DIR="${HOME}/.local/state/edw-kit"
-LOG_FILE="${STATE_DIR}/install.log"
+source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/lib/common.sh"
+source "${EDW_ROOT}/lib/steps.sh"
+
+# ── Profiles ─────────────────────────────────────────────────────────────────
+
+profile_shell() {
+  stow_package "shell"            # oh-my-zsh core (pinned submodule)
+}
+
+profile_terminal() {
+  profile_shell
+  brew_bundle "terminal"
+  brew_bundle "terminal_extras"
+  stow_package "terminal"         # zsh, tmux, vim, starship, omz plugins
+}
+
+profile_workstation() {
+  profile_terminal
+  if ! is_macos; then
+    log "SKIP: workstation layer is macOS-only"
+    return 0
+  fi
+  brew_bundle "workstation"
+  stow_package "workstation"      # ghostty, karabiner, aerospace
+}
+
+profile_full() {
+  profile_workstation
+  if ! is_macos; then
+    log "SKIP: full layer is macOS-only"
+    return 0
+  fi
+  brew_bundle "full" --no-mas
+  mas_install "1Focus" "1258530160"
+}
+
+# ── CLI ──────────────────────────────────────────────────────────────────────
 
 PROFILE="terminal"
-SKIP_BREW=0
-SKIP_STOW=0
-DRY_RUN=0
-
-mkdir -p "${STATE_DIR}"
-touch "${LOG_FILE}"
-
-log() {
-  printf '[%s] %s\n' "$(date '+%Y-%m-%d %H:%M:%S')" "$*" | tee -a "${LOG_FILE}"
-}
-
-die() {
-  log "ERROR: $*"
-  exit 1
-}
 
 usage() {
   cat <<'EOF'
@@ -28,17 +55,13 @@ Usage:
   ./install.sh [PROFILE]
   ./install.sh --profile PROFILE [--dry-run] [--skip-brew] [--skip-stow]
 
-Profiles:
-  shell         base shell
-  terminal      terminal tooling
-  workstation   terminal + workstation layer (macOS-focused)
-  full          workstation + full app layer
+Profiles (cumulative):
+  shell         oh-my-zsh core only
+  terminal      shell + CLI tooling + terminal dotfiles
+  workstation   terminal + macOS desktop layer
+  full          workstation + GUI apps + App Store apps
 
-Compatibility aliases:
-  0 -> shell
-  1 -> terminal
-  2 -> workstation
-  3 -> full
+Numeric aliases: 0=shell 1=terminal 2=workstation 3=full
 EOF
 }
 
@@ -50,128 +73,6 @@ normalize_profile() {
     3|full) echo "full" ;;
     *) return 1 ;;
   esac
-}
-
-run_step() {
-  local label="$1"
-  shift
-  if [[ "${DRY_RUN}" -eq 1 ]]; then
-    log "DRY-RUN: ${label}"
-    return
-  fi
-  log "→ ${label}"
-  "$@" >>"${LOG_FILE}" 2>&1
-  log "✓ ${label}"
-}
-
-require_cmd() {
-  command -v "$1" >/dev/null 2>&1 || die "required command '$1' not found"
-}
-
-brew_bundle() {
-  local file="$1"
-  if [[ "${SKIP_BREW}" -eq 1 ]]; then
-    log "SKIP: brew bundle ${file}"
-    return
-  fi
-  require_cmd brew
-  run_step "brew bundle ${file}" brew bundle --verbose --file="${ROOT_DIR}/${file}"
-}
-
-brew_bundle_no_mas() {
-  local file="$1"
-  if [[ "${SKIP_BREW}" -eq 1 ]]; then
-    log "SKIP: brew bundle ${file} (no mas)"
-    return
-  fi
-  require_cmd brew
-  run_step "brew bundle ${file} (skip mas)" env HOMEBREW_BUNDLE_MAS_SKIP=1 brew bundle --verbose --file="${ROOT_DIR}/${file}"
-}
-
-stow_profile() {
-  local profile_name="$1"
-  local source_dir="${ROOT_DIR}/dotfiles/${profile_name}"
-  [[ -d "${source_dir}" ]] || die "missing dotfiles profile directory: ${source_dir}"
-
-  if [[ "${SKIP_STOW}" -eq 1 ]]; then
-    log "SKIP: stow ${profine_name} from  dotfiles/${profile_name}"
-    return
-  fi
-
-  require_cmd stow
-  run_step "stow ${profile_name}" stow --verbose --restow --target="${HOME}" "${profile_name}"
-}
-
-host_overlay() {
-  if [[ "${SKIP_STOW}" -eq 1 ]]; then
-    return
-  fi
-
-  local host_name
-  if [[ "$(uname -s)" == "Darwin" ]] && command -v scutil >/dev/null 2>&1; then
-    host_name="$(scutil --get LocalHostName 2>/dev/null || hostname -s)"
-  else
-    host_name="$(hostname -s)"
-  fi
-
-  local host_dir="${ROOT_DIR}/dotfiles/hosts/${host_name}"
-  if [[ -d "${host_dir}" ]]; then
-    run_step "stow dotfiles/hosts/${host_name}" stow --restow --target="${HOME}" --dir="${ROOT_DIR}/dotfiles/hosts" "${host_name}"
-  fi
-}
-
-link_submodule() {
-  local source="$1"
-  local target="$2"
-  if [[ -e "${target}" && ! -L "${target}" ]]; then
-    log "WARN: ${target} exists and is not a symlink; keeping local version"
-    return
-  fi
-  run_step "link $(basename "${target}")" ln -sfn "${source}" "${target}"
-}
-
-install_mas_apps() {
-  local app_1focus_id="1258530160"
-  if ! command -v mas >/dev/null 2>&1; then
-    log "SKIP: mas is not installed"
-    return
-  fi
-  if ! mas account >/dev/null 2>&1; then
-    log "SKIP: App Store not signed in"
-    return
-  fi
-  run_step "mas install 1Focus" mas install "${app_1focus_id}"
-}
-
-install_shell() {
-    stow_profile "shell"
-}
-
-install_terminal() {
-  install_shell
-  brew_bundle "brew/Brewfile.terminal"
-  brew_bundle "brew/Brewfile.terminal_extras"
-  stow_profile "terminal"
-}
-
-install_workstation() {
-  install_terminal
-  if [[ "$(uname -s)" != "Darwin" ]]; then
-    log "SKIP: workstation layer is macOS-focused"
-    return
-  fi
-  brew_bundle "brew/Brewfile.workstation"
-  stow_profile "workstation"
-}
-
-install_full() {
-  install_workstation
-  if [[ "$(uname -s)" != "Darwin" ]]; then
-    log "SKIP: full layer is macOS-focused"
-    return
-  fi
-  brew_bundle_no_mas "brew/Brewfile.full"
-  install_mas_apps
 }
 
 parse_args() {
@@ -197,19 +98,14 @@ parse_args() {
 main() {
   parse_args "$@"
 
-  log "Starting (profile=${PROFILE}). Log: ${LOG_FILE}"
+  log "Starting (profile=${PROFILE}). Log: ${EDW_LOG_FILE}"
 
-  case "${PROFILE}" in
-    shell) install_shell ;;
-    terminal) install_terminal ;;
-    workstation) install_workstation ;;
-    full) install_full ;;
-    *) die "unsupported profile: ${PROFILE}" ;;
-  esac
+  "profile_${PROFILE}"
+  stow_host_overlay
+  run_step_optional "reload running environment" "${EDW_ROOT}/scripts/reload-env.sh"
 
-  host_overlay
-  run_step "setup environment" "${ROOT_DIR}/setup-env.sh"
-  log "Done (profile=${PROFILE}). Log: ${LOG_FILE}"
+  log "Done (profile=${PROFILE}). Log: ${EDW_LOG_FILE}"
+  log "Next: run 'exec zsh' (or ./scripts/doctor.sh to verify)"
 }
 
 main "$@"

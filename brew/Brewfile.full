@@ -1,15 +1,24 @@
-# brew bundle --file=brew/Brewfile.full
+# Brewfile.full — everything else: communication, media, maintenance.
+# Applied on top of the workstation tier. App Store entries are installed
+# by install.sh via mas_install so a missing account doesn't abort the run.
 
+# ── Communication ────────────────────────────────────────────────────────────
 cask "telegram"
+
+# ── Media ────────────────────────────────────────────────────────────────────
 cask "obs"                    # Screen recording and live streaming
 cask "vlc"                    # Media player
 cask "handbrake"              # Video transcoder — compress and convert footage
 cask "imageoptim"             # Lossless image compression
+# cask "iina"                 # Modern macOS-native media player — VLC alternative
+
+# ── System maintenance ───────────────────────────────────────────────────────
 cask "bartender"              # Menu bar organizer
 cask "cleanmymac"             # macOS cleaner — cache, junk, app removal
-# cask "raycast"                # Spotlight replacement — launcher, clipboard, snippets
-# cask "monitorcontrol"         # External monitor brightness/volume from Mac
+# cask "jordanbaird-ice"      # Free, open-source bartender alternative
+# cask "appcleaner"           # Free app uninstaller — removes leftovers
 
+# ── App Store ────────────────────────────────────────────────────────────────
 brew "mas"
 mas "1Focus", id: 1258530160          # Focus / app blocker
 # mas "Lungo", id: 1263070803         # Keep Mac awake (use caffeinate instead)

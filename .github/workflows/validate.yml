@@ -1,4 +1,4 @@
-name: Validate bootstrap files
+name: Validate
 
 on:
   pull_request:
@@ -6,23 +6,49 @@ on:
     branches: [main]
 
 jobs:
-  validate:
+  shell:
+    name: Shell scripts
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Syntax check (bash -n)
+        run: |
+          for f in bootstrap.sh install.sh lib/*.sh scripts/*.sh; do
+            bash -n "$f" && echo "✓ $f"
+          done
+      - name: ShellCheck
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq shellcheck
+          # SC1091: sourced files resolved at runtime
+          shellcheck -x -e SC1091 bootstrap.sh install.sh lib/*.sh scripts/*.sh
+
+  brewfiles:
+    name: Brewfiles parse
     runs-on: macos-latest
     permissions:
       contents: read
     steps:
       - uses: actions/checkout@v4
-      - name: Set up Homebrew
+      - name: Parse all Brewfiles
         run: |
-          brew --version
-      - name: Validate Brewfiles parse
+          # `brew bundle list` parses the file without installing anything;
+          # a malformed Brewfile fails the job.
+          for f in brew/Brewfile.terminal brew/Brewfile.terminal_extras brew/Brewfile.workstation brew/Brewfile.full; do
+            echo "── $f"
+            brew bundle list --all --file="$f"
+          done
+
+  install-dry-run:
+    name: install.sh dry run
+    runs-on: macos-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Dry-run every profile
         run: |
-          brew bundle check --no-upgrade --file=brew/Brewfile.tier1 || true
-          brew bundle check --no-upgrade --file=brew/Brewfile.tier2 || true
-          brew bundle check --no-upgrade --file=brew/Brewfile.tier3 || true
-      - name: Validate shell syntax
-        run: |
-          bash -n install.sh
-          bash -n bootstrap.sh
-          bash -n scripts/lock-brewfiles.sh
-          bash -n scripts/secrets-bootstrap.sh
+          for p in shell terminal workstation full; do
+            ./install.sh --profile "$p" --dry-run
+          done

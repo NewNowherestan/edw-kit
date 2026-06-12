@@ -1,22 +1,36 @@
-# brew bundle --file=brew/Brewfile.workstation
+# Brewfile.workstation — macOS desktop layer: window management, terminal
+# emulator, input, fonts. Applied on top of the terminal tier.
 
 # ── Window & input ───────────────────────────────────────────────────────────
 tap "nikitabobko/tap"
-cask "nikitabobko/tap/aerospace"              # Tiling window manager — i3-inspired, keyboard-driven
+cask "nikitabobko/tap/aerospace"  # Tiling window manager — i3-inspired, keyboard-driven
 cask "karabiner-elements"     # Key remapping — Caps Lock → layout/input switch
 cask "hammerspoon"            # macOS automation via Lua — hotkeys, window rules
+cask "scroll-reverser"        # Separate trackpad/mouse scrolling direction
 
 # ── Terminal ─────────────────────────────────────────────────────────────────
-cask "ghostty"
+cask "ghostty"                # GPU-accelerated terminal — replaced iTerm2
 
-# ── Productivity ─────────────────────────────────────────────────────────────
+# ── Menu bar & system ────────────────────────────────────────────────────────
 cask "stats"                  # System stats in menu bar — CPU, RAM, network
-cask "maccy"
+cask "maccy"                  # Clipboard history
+cask "aldente"                # Battery charge limiter for longevity
+cask "browserosaurus"         # Browser picker by link/app context
 
 # ── Fonts ────────────────────────────────────────────────────────────────────
 cask "font-jetbrains-mono-nerd-font"
 cask "font-fira-code-nerd-font"
 cask "font-hack-nerd-font"
-cask "browserosaurus"         # Browser picker by link/app context
-cask "scroll-reverser"        # Separate trackpad/mouse scrolling direction
-cask "aldente"                # Battery charge limiter for longevity
+
+# ── IDE & dev (uncomment what you need) ──────────────────────────────────────
+# cask "jetbrains-toolbox"    # Manages IntelliJ IDEA & friends — JetBrains way
+# cask "intellij-idea"        # Or install IDEA directly, skipping Toolbox
+# cask "orbstack"             # Docker Desktop replacement — fast, light
+# cask "temurin"              # Eclipse Temurin JDK (latest LTS)
+
+# ── More ideas (uncomment to try) ────────────────────────────────────────────
+# cask "raycast"              # Spotlight replacement — launcher, clipboard, snippets
+# cask "alt-tab"              # Windows-style window switcher with previews
+# cask "shottr"               # Screenshot tool — annotations, scrolling capture, OCR
+# cask "monitorcontrol"       # External monitor brightness/volume from Mac
+# cask "keka"                 # Archive manager — 7z, rar, zip
