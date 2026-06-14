@@ -149,7 +149,7 @@ quick-terminal-screen = macos-menu-bar
 quick-terminal-size = 65%,100%
 quick-terminal-animation-duration = 0.15
 
-quick-terminal-autohide = false
+quick-terminal-autohide = true
 quick-terminal-space-behavior = remain
 
 quick-terminal-keyboard-interactivity = exclusive
