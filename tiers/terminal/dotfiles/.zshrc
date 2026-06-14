@@ -1,5 +1,19 @@
 # ~/.zshrc — managed by edw-kit (tiers/terminal/dotfiles). Edit there, not in ~.
 
+# ── Homebrew on PATH ─────────────────────────────────────────────────────────
+# The installer puts `brew shellenv` in ~/.zprofile, which only runs for LOGIN
+# shells. Non-login interactive shells — Ghostty's quick terminal, tmux popups,
+# `zsh -c` — skip it, so brew tools (starship, zoxide, tmux…) fall off PATH and
+# everything below breaks. Load it here too; the guard makes it a no-op when
+# .zprofile already ran.
+if [[ -z "${HOMEBREW_PREFIX:-}" ]]; then
+  if [[ -x /opt/homebrew/bin/brew ]]; then
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+  elif [[ -x /usr/local/bin/brew ]]; then
+    eval "$(/usr/local/bin/brew shellenv)"
+  fi
+fi
+
 # ── Oh My Zsh ────────────────────────────────────────────────────────────────
 export ZSH="$HOME/.oh-my-zsh"                  # core, owned by the shell tier
 export ZSH_CUSTOM="$HOME/.config/omz-custom"   # plugins, owned by the terminal tier
