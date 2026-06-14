@@ -6,10 +6,10 @@ export ZSH_CUSTOM="$HOME/.config/omz-custom"   # plugins, owned by the terminal 
 ZSH_THEME="robbyrussell"      # cosmetic only — starship takes over the prompt below
 
 # tmux plugin: auto-start/attach a "main" session on shell launch
-ZSH_TMUX_AUTOSTART=true
-ZSH_TMUX_AUTOSTART_ONCE=true
-ZSH_TMUX_AUTOCONNECT=true
-ZSH_TMUX_DEFAULT_SESSION_NAME="main"
+#ZSH_TMUX_AUTOSTART=true
+#ZSH_TMUX_AUTOSTART_ONCE=true
+#ZSH_TMUX_AUTOCONNECT=true
+#ZSH_TMUX_DEFAULT_SESSION_NAME="main"
 
 # Custom plugins live in tiers/terminal/dotfiles/.config/omz-custom/plugins (submodules)
 plugins=(
@@ -61,6 +61,7 @@ export NVM_DIR="$HOME/.nvm"
 
 # ── Aliases ──────────────────────────────────────────────────────────────────
 # Cheatsheet: docs/cheatsheets/aliases.md
+alias tmux_main='tmux new-session -A -s main'
 alias cc='clipcopy'           # stdin/file → clipboard
 alias cv='clippaste'          # clipboard → stdout (was `cp`, which shadowed cp(1)!)
 alias cnms='clippaste | nms -a -f cyan'
