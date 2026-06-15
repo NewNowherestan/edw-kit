@@ -269,7 +269,7 @@ font-family = JetBrains Mono
 # Needed if you use vim, emacs, or any tool that uses Alt/Meta key chords.
 # left = left Option only,  right = right Option only,  true = both sides.
 #
-# macos-option-as-alt = left
+macos-option-as-alt = left
 
 
 # --- Kitty Image Protocol --------------------------------------------------
