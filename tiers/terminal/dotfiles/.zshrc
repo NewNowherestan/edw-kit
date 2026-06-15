@@ -1,4 +1,7 @@
 # ~/.zshrc — managed by edw-kit (tiers/terminal/dotfiles). Edit there, not in ~.
+#
+# Load optional profiler
+[[ -f "$HOME/.zsh_profiler.zsh" ]] && source "$HOME/.zsh_profiler.zsh"
 
 # ── Homebrew on PATH ─────────────────────────────────────────────────────────
 # The installer puts `brew shellenv` in ~/.zprofile, which only runs for LOGIN
@@ -15,8 +18,13 @@ if [[ -z "${HOMEBREW_PREFIX:-}" ]]; then
 fi
 
 # ── Oh My Zsh ────────────────────────────────────────────────────────────────
+export EDITOR=vim
+export VISUAL=vim
+
 export ZSH="$HOME/.oh-my-zsh"                  # core, owned by the shell tier
 export ZSH_CUSTOM="$HOME/.config/omz-custom"   # plugins, owned by the terminal tier
+export UDATE_ZSH_DAYS=7
+
 ZSH_THEME="robbyrussell"      # cosmetic only — starship takes over the prompt below
 
 # tmux plugin: auto-start/attach a "main" session on shell launch
@@ -32,25 +40,32 @@ plugins=(
     zsh-syntax-highlighting
     aliases
     tmux
-    docker
+#    docker
     copypath
     copyfile
     macos
     dirhistory
-    extract
+#    extract
     zsh-autosuggestions
     auto-notify
     zsh-you-should-use
     fzf-tab                   # requires fzf (Brewfile.terminal)
 
-    branch
-    colored-man-pages
-    man
+#    branch
+#    colored-man-pages
+#    man
     thefuck
     vi-mode
     zoxide
     # iterm2                  # re-enable if you go back to iTerm2
 )
+
+#Faster compinit (before OMZ so its wrappers use it)
+autoload -Uz compinit
+for dump in ~/.zcompdump(N.mh+24); do
+  compinit
+done
+compinit -C
 
 source "$ZSH/oh-my-zsh.sh"
 

@@ -25,7 +25,7 @@ fi
 # ghostty: reloads config on SIGUSR1
 if pgrep -x "ghostty" >/dev/null 2>&1; then
   log "Reloading ghostty configuration..."
-  killall -USR1 ghostty
+  killall -USR2 ghostty
 fi
 
 log "Reload complete."
