@@ -97,6 +97,7 @@ alias cnms='clippaste | nms -a -f cyan'
 alias lgit='lazygit'
 alias th='fuck'
 alias cm='cmatrix -s -C cyan'
+alias aerostat='aerospace list-windows --all --format "%{workspace} │ %{window-id} │ %{app-name} │ %{window-title}"| sort | column -t -s "│"'
 
 alias adbscreen_save='adb exec-out screencap -p > ~/Downloads/screen_$(date +"%Y-%m-%d_%H-%M-%S").png'
 alias adbscreen='adb exec-out screencap -p > /tmp/adb_screen.png && \
