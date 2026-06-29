@@ -1,3 +1,6 @@
+#docker compose run --build --rm claude
+#docker compose run --rm claude
+#
 services:
   claude:
     build:
