@@ -4,6 +4,31 @@
             "complex_modifications": {
                 "rules": [
                     {
+                        "description": "Side mouse buttons → switch Spaces",
+                        "manipulators": [
+                            {
+                                "from": { "pointing_button": "button4" },
+                                "to": [
+                                    {
+                                        "key_code": "left_arrow",
+                                        "modifiers": ["control"]
+                                    }
+                                ],
+                                "type": "basic"
+                            },
+                            {
+                                "from": { "pointing_button": "button5" },
+                                "to": [
+                                    {
+                                        "key_code": "right_arrow",
+                                        "modifiers": ["control"]
+                                    }
+                                ],
+                                "type": "basic"
+                            }
+                        ]
+                    },
+                    {
                         "description": "Caps Lock switches keyboard input source",
                         "manipulators": [
                             {
