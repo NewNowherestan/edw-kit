@@ -48,7 +48,12 @@ run_step() {
     return 0
   fi
   log "→ ${label}"
-  "$@" >>"${EDW_LOG_FILE}" 2>&1
+  if ! "$@" >>"${EDW_LOG_FILE}" 2>&1; then
+    printf '\n── last 20 log lines ──\n' >&2
+    tail -n 20 "${EDW_LOG_FILE}" >&2
+    printf '───────────────────────\n' >&2
+    die "step failed: ${label}"
+  fi
   log "✓ ${label}"
 }
 

@@ -77,7 +77,8 @@ tier_stow() {
   fi
   [[ "${DRY_RUN}" -eq 1 ]] || require_cmd stow
   run_step "${tier_rel}: stow dotfiles" \
-    stow --verbose --restow --dir="${EDW_ROOT}/${tier_rel}" --target="${HOME}" dotfiles
+    stow --verbose --adopt --restow --dir="${EDW_ROOT}/${tier_rel}" --target="${HOME}" dotfiles
+  log "NOTE: stow --adopt may have pulled existing files into the repo — run 'git status' to review before committing."
 }
 
 # apply_host_tier — hosts/<hostname> is an ordinary tier applied last,
